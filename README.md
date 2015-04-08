@@ -6,7 +6,8 @@ Current version works fine with 100ns resolution, but it will support up to 1ns 
 
 This library **only** works on **Intel Processors**.
 
-# Performance comparison (tested on Intel(R) Xeon(R) CPU E5-2630 v2):
+# Performance comparison 
+tested on Intel(R) Xeon(R) CPU E5-2630 v2 and Fedora release 20 (Heisenbug)
 
 | Function                             | Resolution | Time per call  |
 | ------------------------------------ | ----------:| -----:|

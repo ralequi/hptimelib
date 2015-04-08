@@ -1,6 +1,6 @@
 ALL: lib/realtime.a lib/realtime.so Examples
 
-Examples: examples/deviationTest
+Examples: examples/deviationTest examples/performanceTest
 
 #Flags
 CFLAGS = -O3 -march=native -mtune=native -Wall -Werror
@@ -28,8 +28,11 @@ examples:
 
 #clean
 clean:
-	rm -rf obj lib
+	rm -rf obj lib examples
 
 #Examples
 examples/deviationTest: src/examples/deviationTest.c examples obj/realtime.o
 	gcc $(CFLAGS) $(LFLAGS) obj/realtime.o src/examples/deviationTest.c -o examples/deviationTest
+
+examples/performanceTest: src/examples/performanceTest.c examples obj/realtime.o
+	gcc $(CFLAGS) $(LFLAGS) obj/realtime.o src/examples/performanceTest.c -o examples/performanceTest

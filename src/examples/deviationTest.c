@@ -1,4 +1,4 @@
-#include "../realtime.h"
+#include "../hptl.h"
 #include <time.h>
 
 #define TESTREPEAT   1000L
@@ -8,14 +8,14 @@ struct timespec diff(struct timespec start, struct timespec end);
 
 int main(int argc, char**argv)
 {
-	realtime_init();
+	hptl_init(NULL);
 
 	unsigned long i=0,j=0;
 	uint64_t tmp = 0;
 
 	struct timespec cmtime,rt,df;
 
-	printf("Deviation Test started...[%lu]\n",realtime_get());
+	printf("Deviation Test started...[%lu]\n",hptl_get());
 
 	for (j=0;j<TESTREPEAT;j++)
 	{
@@ -23,7 +23,7 @@ int main(int argc, char**argv)
 
 		for(i=0;i<TESTTIME;i++)
 		{
-			tmp = realtime_get();
+			tmp = hptl_get();
 		}
 
 		if( clock_gettime( CLOCK_REALTIME, &cmtime) == -1 ) {
@@ -31,9 +31,9 @@ int main(int argc, char**argv)
 			return -1;
 		}
 
-		rt = realtime_timespec(tmp);
+		rt = hptl_timespec(tmp);
 		df = diff(cmtime,rt);
-		printf(" Deviation of %lu and %lu ns from clock_gettime(CLOCK_REALTIME)\n",df.tv_sec,df.tv_nsec);
+		printf(" Deviation of %lu s and %lu ns from clock_gettime(CLOCK_REALTIME)\n",df.tv_sec,df.tv_nsec);
 
 	}
 

@@ -15,3 +15,8 @@ tested on Intel(R) Xeon(R) CPU E5-2630 v2 and Fedora release 20 (Heisenbug)
 | clock_gettime(CLOCK_REALTIME)        | 1 ns       | 25 ns |
 | clock_gettime(CLOCK_REALTIME_COARSE) | 1000000 ns |  7 ns |
 | gettimeofday(NULL)                   | 1000 ns    | 26 ns |
+
+# Known bugs/limitations
+
+- Not multithread support
+- Support multicore systems if constant_tsc cpuflag is present, if not, the process that initializes the library must not change the cpu core or the metrics will be wrong.

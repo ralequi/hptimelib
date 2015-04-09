@@ -1,8 +1,8 @@
 # High Performance Timing Library
 
-Currently in development phase. (Making it user-friendly)
+Currently in development phase. (Adding MultiThread Support)
 
-Current version works fine with 100ns resolution, but it will support up to 1ns without losing performance in the next commits.
+Current version supports up to 1ns resolution.
 
 This library **only** works on **Intel Processors**.
 
@@ -19,4 +19,6 @@ tested on Intel(R) Xeon(R) CPU E5-2630 v2 and Fedora release 20 (Heisenbug)
 # Known bugs/limitations
 
 - Not multithread support
-- Support multicore systems if constant_tsc cpuflag is present, if not, the process that initializes the library must not change the cpu core or the metrics will be wrong.
+- Support multicore systems if constant_tsc cpuflag is present, if not, the process that initializes the library must not change the cpu core or the metrics will be wrong. By 
+default, the lib wont compile if that flag is not present, the user should modify makefile and ensure that the processes are stable in a given core from the start of the 
+application.

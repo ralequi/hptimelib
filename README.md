@@ -11,7 +11,7 @@ tested on Intel(R) Xeon(R) CPU E5-2630 v2 and Fedora release 20 (Heisenbug)
 
 | Function                             | Resolution | Time per call  |
 | ------------------------------------ | ----------:| -----:|
-| HPTimeLib                            | 100 ns     | **22 ns** |
+| HPTimeLib                            | 1 ns     | **22 ns** |
 | clock_gettime(CLOCK_REALTIME)        | 1 ns       | 25 ns |
 | clock_gettime(CLOCK_REALTIME_COARSE) | 1000000 ns |  7 ns |
 | gettimeofday(NULL)                   | 1000 ns    | 26 ns |

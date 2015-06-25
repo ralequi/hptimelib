@@ -1,5 +1,7 @@
 #include "hptl.h"
 
+hptl_t hptl_get_slow(void);
+
 /********************* VARIABLES *********************/
 
 uint64_t __hptl_time;
@@ -176,27 +178,6 @@ int hptl_init(hptl_config * conf)
 	return 0;
 }
 
-hptl_t hptl_get_slow(void)
-{
-	double tmp;
-
-	union {
-		uint64_t tsc_64;
-		struct {
-			uint32_t lo_32;
-			uint32_t hi_32;
-		};
-	} tsc;
-
-	asm volatile("rdtsc" :
-		 "=a" (tsc.lo_32),
-		 "=d" (tsc.hi_32));
-
-	tmp=((tsc.tsc_64 - __hptl_cicles) * (double)PRECCISION);
-	return (tmp/ __hptl_hz) + __hptl_time;
-}
-
-
 void hptl_sync(void)
 {
 	struct timespec tmp;
@@ -246,11 +227,10 @@ hptl_t hptl_get(void)
 /**
  * Return the resolution in terms of ns
  **/
-uint64_t hptl_getres()
+uint64_t hptl_getres(void)
 {
 	return 1000000000ull/PRECCISION;
 }
-
 
 /**
  * Converts from realtime format to timespect format
@@ -259,15 +239,21 @@ struct timespec hptl_timespec(hptl_t u64)
 {
 	struct timespec tmp;
 
-	u64 = hptl_get_slow();
-
 	tmp.tv_sec = u64/PRECCISION;
 	tmp.tv_nsec= (u64-(tmp.tv_sec*PRECCISION))*(1000000000ull/PRECCISION);
 
-        if(clock_gettime( CLOCK_REALTIME, &tmp) != 0)
-        {
-                printf("[HPTLib] WARN: Clock_gettime ERROR!\n");
-        }
+	return tmp;
+}
+
+/**
+ * Converts from realtime format to timeval format
+ **/
+struct timeval hptl_timeval(hptl_t u64)
+{
+	struct timeval tmp;
+
+	tmp.tv_sec = u64/PRECCISION;
+	tmp.tv_usec= (u64-(tmp.tv_sec*PRECCISION))*(1000000ull/PRECCISION);
 
 	return tmp;
 }
@@ -280,3 +266,25 @@ uint64_t hptl_ntimestamp(hptl_t hptltime)
 	return hptltime*(1000000000ull/PRECCISION);
 }
 
+/***********
+ * Obsolete...
+ ***********/
+hptl_t hptl_get_slow(void)
+{
+	double tmp;
+
+	union {
+		uint64_t tsc_64;
+		struct {
+			uint32_t lo_32;
+			uint32_t hi_32;
+		};
+	} tsc;
+
+	asm volatile("rdtsc" :
+		 "=a" (tsc.lo_32),
+		 "=d" (tsc.hi_32));
+
+	tmp=((tsc.tsc_64 - __hptl_cicles) * (double)PRECCISION);
+	return (tmp/ __hptl_hz) + __hptl_time;
+}

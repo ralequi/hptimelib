@@ -56,12 +56,17 @@ hptl_t hptl_get(void);
 /**
  * Return the resolution in terms of ns
  **/
-uint64_t hptl_getres();
+uint64_t hptl_getres(void);
 
 /**
  * Converts from HPTLib format to timespec format
  **/
 struct timespec hptl_timespec(hptl_t hptltime);
+
+/**
+ * Converts from HPTLib format to timeval format
+ **/
+struct timeval hptl_timeval(hptl_t hptltime);
 
 /**
  * Converts from HPTLib format to ns from 01 Jan 1970

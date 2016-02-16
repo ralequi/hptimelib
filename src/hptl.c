@@ -2,7 +2,7 @@
 
 hptl_t hptl_get_slow(void);
 
-/********************* VARIABLES *********************/
+/******************** VARIABLES ********************/
 
 uint64_t __hptl_time;
 uint64_t __hptl_cicles;
@@ -24,21 +24,25 @@ asm volatile ("pushf ;"             \
     : "=a" (isOverflow));           \
 isOverflow = (isOverflow & 0x800) ;}
 
+/*************** STRUCTURES & UNIONS ***************/
+typedef union {
+	uint64_t tsc_64;
+	struct {
+		uint32_t lo_32;
+		uint32_t hi_32;
+	};
+} _hptlru; //hptl rdtsc union.
+
 /** iDPDK FUNCTIONS **/
 static inline uint64_t
 rte_rdtsc(void)
 {
-	union {
-		uint64_t tsc_64;
-		struct {
-			uint32_t lo_32;
-			uint32_t hi_32;
-		};
-	} tsc;
-
+	_hptlru tsc;
+	
 	asm volatile("rdtsc" :
-		     "=a" (tsc.lo_32),
-		     "=d" (tsc.hi_32));
+		"=a" (tsc.lo_32),
+		"=d" (tsc.hi_32));
+		
 	return tsc.tsc_64;
 }
 static int
@@ -46,7 +50,7 @@ set_tsc_freq_from_clock(void)
 {
 #ifdef CLOCK_MONOTONIC_RAW
 #define NS_PER_SEC 1E9
-
+	uint64_t ns, end, start;
         #ifdef __HPTL__DEBUGMODE__
         printf("[HPTLib] Using CLOCK_MONOTONIC_RAW to obtain CPU Hz...\n");
         #endif
@@ -56,10 +60,11 @@ set_tsc_freq_from_clock(void)
 	struct timespec t_start, t_end;
 
 	if (clock_gettime(CLOCK_MONOTONIC_RAW, &t_start) == 0) {
-		uint64_t ns, end, start = rte_rdtsc();
+		start = rte_rdtsc();
 		nanosleep(&sleeptime,NULL);
 		clock_gettime(CLOCK_MONOTONIC_RAW, &t_end);
 		end = rte_rdtsc();
+		
 		ns = ((t_end.tv_sec - t_start.tv_sec) * NS_PER_SEC);
 		ns += (t_end.tv_nsec - t_start.tv_nsec);
 
@@ -200,13 +205,7 @@ hptl_t hptl_get(void)
 	unsigned long long tmp;
 	volatile unsigned long long Oflag;
 
-	union {
-		uint64_t tsc_64;
-		struct {
-			uint32_t lo_32;
-			uint32_t hi_32;
-		};
-	} tsc;
+	_hptlru tsc;
 
 	asm volatile("rdtsc" :
 		 "=a" (tsc.lo_32),
@@ -233,6 +232,24 @@ uint64_t hptl_getres(void)
 }
 
 /**
+ * Wait certain ns actively
+ **/
+void hptl_waitns(uint64_t ns)
+{
+	hptl_t start, end;
+	
+	start = rte_rdtsc();
+	
+	float cycles = ((float)ns)*((float)__hptl_hz)/1000000000.;
+	end = start + cycles;
+		 
+	do
+	{
+		start = rte_rdtsc();
+	}while(start<end);
+}
+
+/**
  * Converts from realtime format to timespect format
  **/
 struct timespec hptl_timespec(hptl_t u64)
@@ -253,7 +270,7 @@ struct timeval hptl_timeval(hptl_t u64)
 	struct timeval tmp;
 
 	tmp.tv_sec = u64/PRECCISION;
-	tmp.tv_usec= (u64-(tmp.tv_sec*PRECCISION))*(1000000ull/PRECCISION);
+	tmp.tv_usec= ((u64-(tmp.tv_sec*PRECCISION))*1000000ull)/PRECCISION;
 
 	return tmp;
 }

@@ -1,6 +1,11 @@
 #ifndef __HPTLIB__H__
 #define __HPTLIB__H__
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 #include <inttypes.h>
 #include <time.h>
 #include <stddef.h>
@@ -59,6 +64,14 @@ hptl_t hptl_get(void);
 uint64_t hptl_getres(void);
 
 /**
+ * Wait certain ns actively.
+ * hptl should be initialized first.
+ **/
+void hptl_waitns(uint64_t ns);
+
+/** UTILS **/
+
+/**
  * Converts from HPTLib format to timespec format
  **/
 struct timespec hptl_timespec(hptl_t hptltime);
@@ -72,5 +85,9 @@ struct timeval hptl_timeval(hptl_t hptltime);
  * Converts from HPTLib format to ns from 01 Jan 1970
  **/
 uint64_t hptl_ntimestamp(hptl_t hptltime);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

@@ -1,17 +1,22 @@
-#include "../hptl.h"
+#include <hptl.h>
 #include <time.h>
 
 #define TESTREPEAT   1000L
 #define TESTTIME 10000000L
 
-struct timespec diff(struct timespec start, struct timespec end);
+struct timespec diff(struct timespec start, struct timespec end, char * sign);
 
 int main(int argc, char**argv)
 {
-	hptl_init(NULL);
+	hptl_config confhptl;
+	confhptl.precision=3;
+	confhptl.clockspeed=0;
+	
+	hptl_init(&confhptl);
 
 	unsigned long i=0,j=0;
 	uint64_t tmp = 0;
+	char sign='+';
 
 	struct timespec cmtime,rt,df;
 
@@ -32,8 +37,13 @@ int main(int argc, char**argv)
 		}
 
 		rt = hptl_timespec(tmp);
-		df = diff(cmtime,rt);
-		printf(" Deviation of %lu s and %lu ns from clock_gettime(CLOCK_REALTIME)\n",df.tv_sec,df.tv_nsec);
+		df = diff(cmtime,rt,&sign);
+		printf(" Deviation of %c %lu s, %3lu ms, %3lu us, %3lu ns from clock_gettime(CLOCK_REALTIME)\n",
+			sign,
+			df.tv_sec,
+			(df.tv_nsec/1000000000L)%1000L,
+			(df.tv_nsec/1000L)%1000L,
+			df.tv_nsec%1000L);
 
 	}
 
@@ -41,7 +51,7 @@ int main(int argc, char**argv)
 }
 
 
-struct timespec diff(struct timespec start, struct timespec end)
+struct timespec diff(struct timespec start, struct timespec end, char * sign)
 {
 	struct timespec temp;
 
@@ -50,13 +60,15 @@ struct timespec diff(struct timespec start, struct timespec end)
 		temp=end;
 		end=start;
 		start=temp;
+		if(sign!=NULL) *sign='-';
 	}
 	else if (start.tv_sec == end.tv_sec && start.tv_nsec > end.tv_nsec)
         {
                 temp=end;
                 end=start;
                 start=temp;
-        }
+		if(sign!=NULL) *sign='-';
+        } else if(sign!=NULL) *sign='+';
 
 	if ((end.tv_nsec-start.tv_nsec)<0) {
 		temp.tv_sec = end.tv_sec-start.tv_sec-1;

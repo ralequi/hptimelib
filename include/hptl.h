@@ -1,6 +1,11 @@
 #ifndef __HPTLIB__H__
 #define __HPTLIB__H__
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 #include <inttypes.h>
 #include <time.h>
 #include <stddef.h>
@@ -80,5 +85,9 @@ struct timeval hptl_timeval(hptl_t hptltime);
  * Converts from HPTLib format to ns from 01 Jan 1970
  **/
 uint64_t hptl_ntimestamp(hptl_t hptltime);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

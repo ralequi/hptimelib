@@ -59,6 +59,14 @@ hptl_t hptl_get(void);
 uint64_t hptl_getres(void);
 
 /**
+ * Wait certain ns actively.
+ * hptl should be initialized first.
+ **/
+void hptl_waitns(uint64_t ns);
+
+/** UTILS **/
+
+/**
  * Converts from HPTLib format to timespec format
  **/
 struct timespec hptl_timespec(hptl_t hptltime);

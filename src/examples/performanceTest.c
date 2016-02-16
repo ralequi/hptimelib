@@ -1,4 +1,4 @@
-#include "../hptl.h"
+#include <hptl.h>
 #include <time.h>
 #include <sys/time.h>
 

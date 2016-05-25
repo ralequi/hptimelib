@@ -9,8 +9,8 @@ int main(int argc, char**argv)
 	printf("hptlib example test...\n");
 
 	//metric variables
-	//hptl_t start, end;
-	//hptl_t dif;
+	hptl_t start, end;
+	hptl_t dif;
 
 	confhptl.precision=9;
 	confhptl.clockspeed=0;
@@ -52,9 +52,22 @@ int main(int argc, char**argv)
 		
 		
 	//Waiting Example
+			
 	printf("Waiting 3 Seconds..."); fflush(stdout);
-	hptl_waitns(3000000000L);
-	printf("Done!\n"); fflush(stdout);
+	
+	start = hptl_get();
+	hptl_waitns(3000000000L);	
+	end = hptl_get();
+	
+	dif = end-start;
+	
+	printf("Done! (Exactly waited %lu s, %lu ms, %lu us, %lu ns)\n"
+	,dif/1000000000
+	,dif/1000000    - (dif/1000000000)*1000
+	,dif/1000       - (dif/1000000)*1000
+	,dif            - (dif/1000)*1000);
+	
+	fflush(stdout);
 	
 	return 0;
 }

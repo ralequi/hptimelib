@@ -35,7 +35,7 @@ typedef union {
 
 /** iDPDK FUNCTIONS **/
 static inline uint64_t
-rte_rdtsc(void)
+hptl_rdtsc(void)
 {
 	_hptlru tsc;
 	
@@ -60,10 +60,10 @@ set_tsc_freq_from_clock(void)
 	struct timespec t_start, t_end;
 
 	if (clock_gettime(CLOCK_MONOTONIC_RAW, &t_start) == 0) {
-		start = rte_rdtsc();
+		start = hptl_rdtsc();
 		nanosleep(&sleeptime,NULL);
 		clock_gettime(CLOCK_MONOTONIC_RAW, &t_end);
-		end = rte_rdtsc();
+		end = hptl_rdtsc();
 		
 		ns = ((t_end.tv_sec - t_start.tv_sec) * NS_PER_SEC);
 		ns += (t_end.tv_nsec - t_start.tv_nsec);
@@ -192,7 +192,7 @@ void hptl_sync(void)
 	        printf("[HPTLib] WARN: Clock_gettime ERROR!\n");
 	}
 
-	__hptl_cicles = rte_rdtsc();
+	__hptl_cicles = hptl_rdtsc();
 	__hptl_time = tmp.tv_sec * PRECCISION + tmp.tv_nsec/(1000000000ull/PRECCISION);
 
 	#ifdef __HPTL__DEBUGMODE__
@@ -238,14 +238,17 @@ void hptl_waitns(uint64_t ns)
 {
 	hptl_t start, end;
 	
-	start = rte_rdtsc();
+	//start = hptl_rdtsc();
+	start = hptl_get();
 	
-	float cycles = ((float)ns)*((float)__hptl_hz)/1000000000.;
-	end = start + cycles;
+	//float cycles = ((float)ns)*(((float)__hptl_hz)/1000000000.);
+	//end = start + cycles;
+	end = start + ns;
 		 
 	do
 	{
-		start = rte_rdtsc();
+		//start = hptl_rdtsc();
+		start = hptl_get();
 	}while(start<end);
 }
 

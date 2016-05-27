@@ -3,12 +3,12 @@ ALL: lib/hptl.a lib/hptl.so Examples
 Examples: examples/deviationTest examples/performanceTest examples/exampleTest
 
 #Flags
-CFLAGS = -O3 -march=native -mtune=native -std=gnu11 -Wall -Werror -g -Iinclude
+CFLAGS = -O3 -march=native -mtune=native -std=gnu11 -Wall -Werror -g -Iinclude -fPIC
 LFLAGS = -lrt
 
 #Compiling...
 lib/hptl.so: lib obj/hptl.o
-	gcc $(CFLAGS) -shared -o lib/hptl.so -fPIC src/hptl.c
+	gcc $(CFLAGS) -shared -o lib/hptl.so src/hptl.c
 
 lib/hptl.a: lib obj/hptl.o
 	ar rcs lib/hptl.a  obj/hptl.o

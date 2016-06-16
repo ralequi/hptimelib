@@ -19,10 +19,10 @@ static uint64_t __hptl_precision;
 
 /********************* MACROS *********************/
 #define overflowflag(isOverflow){   \
-asm volatile ("pushf ;"             \
-     "pop %%rax"                     \
-    : "=a" (isOverflow));           \
-isOverflow = (isOverflow & 0x800) ;}
+		asm volatile ("pushf ;"             \
+					  "pop %%rax"                     \
+					  : "=a" (isOverflow));           \
+		isOverflow = (isOverflow & 0x800) ;}
 
 /*************** STRUCTURES & UNIONS ***************/
 typedef union {
@@ -38,11 +38,11 @@ static inline uint64_t
 hptl_rdtsc(void)
 {
 	_hptlru tsc;
-	
+
 	asm volatile("rdtsc" :
-		"=a" (tsc.lo_32),
-		"=d" (tsc.hi_32));
-		
+				 "=a"(tsc.lo_32),
+				 "=d"(tsc.hi_32));
+
 	return tsc.tsc_64;
 }
 static int
@@ -51,9 +51,9 @@ set_tsc_freq_from_clock(void)
 #ifdef CLOCK_MONOTONIC_RAW
 #define NS_PER_SEC 1E9
 	uint64_t ns, end, start;
-        #ifdef __HPTL__DEBUGMODE__
-        printf("[HPTLib] Using CLOCK_MONOTONIC_RAW to obtain CPU Hz...\n");
-        #endif
+#ifdef __HPTL__DEBUGMODE__
+	printf("[HPTLib] Using CLOCK_MONOTONIC_RAW to obtain CPU Hz...\n");
+#endif
 
 	struct timespec sleeptime = {.tv_nsec = 5E8 }; /* 1/2 second */
 
@@ -61,17 +61,18 @@ set_tsc_freq_from_clock(void)
 
 	if (clock_gettime(CLOCK_MONOTONIC_RAW, &t_start) == 0) {
 		start = hptl_rdtsc();
-		nanosleep(&sleeptime,NULL);
+		nanosleep(&sleeptime, NULL);
 		clock_gettime(CLOCK_MONOTONIC_RAW, &t_end);
 		end = hptl_rdtsc();
-		
+
 		ns = ((t_end.tv_sec - t_start.tv_sec) * NS_PER_SEC);
 		ns += (t_end.tv_nsec - t_start.tv_nsec);
 
-		double secs = (double)ns/NS_PER_SEC;
-		__hptl_hz = (uint64_t)((end - start)/secs);
+		double secs = (double)ns / NS_PER_SEC;
+		__hptl_hz = (uint64_t)((end - start) / secs);
 		return 0;
 	}
+
 #endif
 	return -1;
 }
@@ -85,40 +86,40 @@ set_tsc_freq_linux(void)
 	unsigned cpu;
 	FILE *f;
 
-	#ifdef __HPTL__DEBUGMODE__
-       	printf("[HPTLib] Using Linux to obtain CPU Hz...\n");
-        #endif
+#ifdef __HPTL__DEBUGMODE__
+	printf("[HPTLib] Using Linux to obtain CPU Hz...\n");
+#endif
 
 	status = syscall(SYS_getcpu, &cpu, NULL, NULL);
-	if(status==-1)
-	{
-		#ifdef __HPTL__DEBUGMODE__
-        	printf("[HPTLib] ERROR: HPTLib.set_tsc_freq_linux.syscall\n");
-	        #endif
+
+	if (status == -1) {
+#ifdef __HPTL__DEBUGMODE__
+		printf("[HPTLib] ERROR: HPTLib.set_tsc_freq_linux.syscall\n");
+#endif
 		exit(-1);
 	}
 
-	sprintf(tmp,"/sys/devices/system/cpu/cpu%d/cpufreq/cpuinfo_cur_freq",cpu);
+	sprintf(tmp, "/sys/devices/system/cpu/cpu%d/cpufreq/cpuinfo_cur_freq", cpu);
 
-	#ifdef __HPTL__DEBUGMODE__
-        printf("[HPTLib] Assuming HPTLib is going to run on %d...\n", cpu);
-        #endif
+#ifdef __HPTL__DEBUGMODE__
+	printf("[HPTLib] Assuming HPTLib is going to run on %d...\n", cpu);
+#endif
 
-	f = fopen(tmp,"r");
-	if(f==NULL)
-	{
+	f = fopen(tmp, "r");
+
+	if (f == NULL) {
 		perror("HPTLib.set_tsc_freq_linux.fopen");
 		exit(-1);
 	}
-	for(i=0;i<15000000;i++); //warm the CPU
 
-	if(fgets(tmp,strlen(tmp),f) == NULL)
-	{
-                perror("HPTLib.set_tsc_freq_linux.fgets");
-                exit(-1);
+	for (i = 0; i < 15000000; i++); //warm the CPU
+
+	if (fgets(tmp, strlen(tmp), f) == NULL) {
+		perror("HPTLib.set_tsc_freq_linux.fgets");
+		exit(-1);
 	}
 
-	__hptl_hz = atol(tmp)*1000ul;
+	__hptl_hz = atol(tmp) * 1000ul;
 
 	fclose(f);
 }
@@ -134,51 +135,56 @@ set_tsc_freq_linux(void)
 static void
 set_tsc_freq(void)
 {
-	if (set_tsc_freq_from_clock() < 0)
+	if (set_tsc_freq_from_clock() < 0) {
 		set_tsc_freq_linux();
-		//set_tsc_freq_fallback();
+	}
+
+	//set_tsc_freq_fallback();
 }
 
 /********************* FUNCTIONS *********************/
 
-int hptl_init(hptl_config * conf)
+int hptl_init(hptl_config *conf)
 {
 	hptl_config config;
-	int i,k=1;
+	int i, k = 1;
 
 	//load config
-	if(conf==NULL)
-	{
-		config.precision=7;
-		config.clockspeed=0;
-	}
-	else
-		config=*conf;
+	if (conf == NULL) {
+		config.precision = 7;
+		config.clockspeed = 0;
 
-	if(config.precision>9)
-	{
-		#ifdef __HPTL__DEBUGMODE__
-        	printf("[HPTLib] Error: precision %u>9\n", config.precision);
-	        #endif
+	} else {
+		config = *conf;
+	}
+
+	if (config.precision > 9) {
+#ifdef __HPTL__DEBUGMODE__
+		printf("[HPTLib] Error: precision %u>9\n", config.precision);
+#endif
 		return -1;
 	}
 
 	//load clockspeed
-	if(config.clockspeed==0)
+	if (config.clockspeed == 0) {
 		set_tsc_freq();
-	else
-		__hptl_hz=config.clockspeed;
+
+	} else {
+		__hptl_hz = config.clockspeed;
+	}
 
 	//config precision
-	for (i=0;i<config.precision;i++)
-		k*=10;
-	PRECCISION=k;
+	for (i = 0; i < config.precision; i++) {
+		k *= 10;
+	}
+
+	PRECCISION = k;
 
 	hptl_sync();
 
-        #ifdef __HPTL__DEBUGMODE__
+#ifdef __HPTL__DEBUGMODE__
 	printf("[HPTLib] Started : Hz:%lu cicles:%lu tof:%lu\n", __hptl_hz, __hptl_cicles, __hptl_time);
-	#endif
+#endif
 
 	return 0;
 }
@@ -187,17 +193,16 @@ void hptl_sync(void)
 {
 	struct timespec tmp;
 
-	if(clock_gettime( CLOCK_REALTIME, &tmp) != 0)
-	{
-	        printf("[HPTLib] WARN: Clock_gettime ERROR!\n");
+	if (clock_gettime(CLOCK_REALTIME, &tmp) != 0) {
+		printf("[HPTLib] WARN: Clock_gettime ERROR!\n");
 	}
 
 	__hptl_cicles = hptl_rdtsc();
-	__hptl_time = tmp.tv_sec * PRECCISION + tmp.tv_nsec/(1000000000ull/PRECCISION);
+	__hptl_time = tmp.tv_sec * PRECCISION + tmp.tv_nsec / (1000000000ull / PRECCISION);
 
-	#ifdef __HPTL__DEBUGMODE__
+#ifdef __HPTL__DEBUGMODE__
 	printf("[HPTLib] Sync: cicles:%lu tof:%lu\n", __hptl_cicles, __hptl_time);
-	#endif
+#endif
 }
 
 hptl_t hptl_get(void)
@@ -208,18 +213,19 @@ hptl_t hptl_get(void)
 	_hptlru tsc;
 
 	asm volatile("rdtsc" :
-		 "=a" (tsc.lo_32),
-		 "=d" (tsc.hi_32));
+				 "=a"(tsc.lo_32),
+				 "=d"(tsc.hi_32));
 
-	tmp=((tsc.tsc_64 - __hptl_cicles) * PRECCISION);
+	tmp = ((tsc.tsc_64 - __hptl_cicles) * PRECCISION);
 
 	overflowflag(Oflag)
-	if(Oflag)
-	{
+
+	if (Oflag) {
 		hptl_sync();
 		return hptl_get();
 	}
-	return (tmp/ __hptl_hz) + __hptl_time;
+
+	return (tmp / __hptl_hz) + __hptl_time;
 
 }
 
@@ -228,7 +234,7 @@ hptl_t hptl_get(void)
  **/
 uint64_t hptl_getres(void)
 {
-	return 1000000000ull/PRECCISION;
+	return 1000000000ull / PRECCISION;
 }
 
 /**
@@ -237,30 +243,28 @@ uint64_t hptl_getres(void)
 void hptl_waitns(uint64_t ns)
 {
 	hptl_t start, end;
-	
+
 	//start = hptl_rdtsc();
 	start = hptl_get();
-	
+
 	//float cycles = ((float)ns)*(((float)__hptl_hz)/1000000000.);
 	//end = start + cycles;
 	end = start + ns;
-		 
-	do
-	{
+
+	do {
 		//start = hptl_rdtsc();
 		start = hptl_get();
-	}while(start<end);
+	} while (start < end);
 }
 
 /**
  * Converts from realtime format to timespect format
  **/
-struct timespec hptl_timespec(hptl_t u64)
-{
+struct timespec hptl_timespec(hptl_t u64) {
 	struct timespec tmp;
 
-	tmp.tv_sec = u64/PRECCISION;
-	tmp.tv_nsec= (u64-(tmp.tv_sec*PRECCISION))*(1000000000ull/PRECCISION);
+	tmp.tv_sec = u64 / PRECCISION;
+	tmp.tv_nsec = (u64 - (tmp.tv_sec *PRECCISION)) *(1000000000ull / PRECCISION);
 
 	return tmp;
 }
@@ -268,12 +272,11 @@ struct timespec hptl_timespec(hptl_t u64)
 /**
  * Converts from realtime format to timeval format
  **/
-struct timeval hptl_timeval(hptl_t u64)
-{
+struct timeval hptl_timeval(hptl_t u64) {
 	struct timeval tmp;
 
-	tmp.tv_sec = u64/PRECCISION;
-	tmp.tv_usec= ((u64-(tmp.tv_sec*PRECCISION))*1000000ull)/PRECCISION;
+	tmp.tv_sec = u64 / PRECCISION;
+	tmp.tv_usec = ((u64 - (tmp.tv_sec *PRECCISION)) * 1000000ull) / PRECCISION;
 
 	return tmp;
 }
@@ -283,7 +286,7 @@ struct timeval hptl_timeval(hptl_t u64)
  **/
 uint64_t hptl_ntimestamp(hptl_t hptltime)
 {
-	return hptltime*(1000000000ull/PRECCISION);
+	return hptltime * (1000000000ull / PRECCISION);
 }
 
 /***********
@@ -302,9 +305,9 @@ hptl_t hptl_get_slow(void)
 	} tsc;
 
 	asm volatile("rdtsc" :
-		 "=a" (tsc.lo_32),
-		 "=d" (tsc.hi_32));
+				 "=a"(tsc.lo_32),
+				 "=d"(tsc.hi_32));
 
-	tmp=((tsc.tsc_64 - __hptl_cicles) * (double)PRECCISION);
-	return (tmp/ __hptl_hz) + __hptl_time;
+	tmp = ((tsc.tsc_64 - __hptl_cicles) * (double)PRECCISION);
+	return (tmp / __hptl_hz) + __hptl_time;
 }

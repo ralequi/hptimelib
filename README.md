@@ -1,4 +1,4 @@
-# High Performance Timing Library
+# High Performance Time Library
 
 Currently in development phase. (Adding MultiThread Support)
 

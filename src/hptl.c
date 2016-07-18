@@ -55,7 +55,7 @@ set_tsc_freq_from_clock(void)
 	printf("[HPTLib] Using CLOCK_MONOTONIC_RAW to obtain CPU Hz...\n");
 #endif
 
-	struct timespec sleeptime = {.tv_sec=0, .tv_nsec = 500000000 }; /* 1/2 second */
+	struct timespec sleeptime = {.tv_sec = 0, .tv_nsec = 500000000 }; /* 1/2 second */
 
 	struct timespec t_start, t_end;
 

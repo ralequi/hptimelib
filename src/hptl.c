@@ -114,7 +114,7 @@ set_tsc_freq_linux(void)
 
 	for (i = 0; i < 15000000; i++); //warm the CPU
 
-	if (fgets(tmp, strlen(tmp), f) == NULL) {
+	if (fgets(tmp, sizeof(tmp), f) == NULL) {
 		perror("HPTLib.set_tsc_freq_linux.fgets");
 		exit(-1);
 	}

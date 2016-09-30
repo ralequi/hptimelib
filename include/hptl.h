@@ -16,8 +16,8 @@ extern "C"
 #include <sys/syscall.h>
 #include <unistd.h>
 
-//Uncomment this line to enter in a debug mode
-//#define __HPTL__DEBUGMODE__
+//Config file
+#include "config.h"
 
 //Type used to store timing in hptlib
 	typedef uint64_t hptl_t;

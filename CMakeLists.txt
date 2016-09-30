@@ -3,7 +3,7 @@ project (High_Performance_Timing_Library)
 # The version number.
 execute_process(
     COMMAND git describe --always --tags
-    OUTPUT_VARIABLE handbeDevice_VERSION)
+    OUTPUT_VARIABLE hptl_VERSION)
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
@@ -73,8 +73,11 @@ add_library(hptl_shared SHARED $<TARGET_OBJECTS:hptl_obj>)
 add_library(hptl_static STATIC $<TARGET_OBJECTS:hptl_obj>)
 
 #Tests
-#add_executable(handBeDevice ${lib_SRC})
+add_executable(deviationTest src/test/deviationTest)
+add_executable(exampleTest src/test/exampleTest)
+add_executable(performanceTest src/test/performanceTest)
 
 #Link library executables
-#target_link_libraries(handBeDevice handbeAPI)
-
+target_link_libraries(deviationTest hptl_static)
+target_link_libraries(exampleTest hptl_static)
+target_link_libraries(performanceTest hptl_static)

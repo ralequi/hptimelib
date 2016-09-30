@@ -6,7 +6,7 @@
 
 struct timespec diff(struct timespec start, struct timespec end, char *sign);
 
-int main(int argc, char **argv)
+int main(/*int argc, char **argv*/)
 {
 	hptl_config confhptl;
 	confhptl.precision = 3;

@@ -1,6 +1,9 @@
+#################################
+# HPTL CONFIG
+#################################
 
-
-
+option(HPTL_DEBUG "Enable HPTL debug text" ON)
+#set   (HPTL_DEBUG "https" CACHE STRING "The server api URI-protocol")
 
 #################################
 # CONFIG FILES

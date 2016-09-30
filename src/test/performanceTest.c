@@ -7,7 +7,7 @@
 
 struct timespec diff(struct timespec start, struct timespec end);
 
-int main(int argc, char **argv)
+int main(/*int argc, char **argv*/)
 {
 	uint64_t i = 0, j = 0;
 	hptl_config confhptl;

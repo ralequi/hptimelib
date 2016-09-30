@@ -51,7 +51,7 @@ set_tsc_freq_from_clock(void)
 #ifdef CLOCK_MONOTONIC_RAW
 #define NS_PER_SEC 1E9
 	uint64_t ns, end, start;
-#ifdef __HPTL__DEBUGMODE__
+#ifdef HPTL_DEBUG
 	printf("[HPTLib] Using CLOCK_MONOTONIC_RAW to obtain CPU Hz...\n");
 #endif
 
@@ -86,14 +86,14 @@ set_tsc_freq_linux(void)
 	unsigned cpu;
 	FILE *f;
 
-#ifdef __HPTL__DEBUGMODE__
+#ifdef HPTL_DEBUG
 	printf("[HPTLib] Using Linux to obtain CPU Hz...\n");
 #endif
 
 	status = syscall(SYS_getcpu, &cpu, NULL, NULL);
 
 	if (status == -1) {
-#ifdef __HPTL__DEBUGMODE__
+#ifdef HPTL_DEBUG
 		printf("[HPTLib] ERROR: HPTLib.set_tsc_freq_linux.syscall\n");
 #endif
 		exit(-1);
@@ -101,7 +101,7 @@ set_tsc_freq_linux(void)
 
 	sprintf(tmp, "/sys/devices/system/cpu/cpu%d/cpufreq/cpuinfo_cur_freq", cpu);
 
-#ifdef __HPTL__DEBUGMODE__
+#ifdef HPTL_DEBUG
 	printf("[HPTLib] Assuming HPTLib is going to run on %d...\n", cpu);
 #endif
 
@@ -149,6 +149,10 @@ int hptl_init(hptl_config *conf)
 	hptl_config config;
 	int i, k = 1;
 
+#ifdef HPTL_DEBUG
+	printf("[HPTL] INFO: Starting HPTL %s\n",hptl_VERSION);
+#endif
+
 	//load config
 	if (conf == NULL) {
 		config.precision = 7;
@@ -159,7 +163,7 @@ int hptl_init(hptl_config *conf)
 	}
 
 	if (config.precision > 9) {
-#ifdef __HPTL__DEBUGMODE__
+#ifdef HPTL_DEBUG
 		printf("[HPTLib] Error: precision %u>9\n", config.precision);
 #endif
 		return -1;
@@ -182,7 +186,7 @@ int hptl_init(hptl_config *conf)
 
 	hptl_sync();
 
-#ifdef __HPTL__DEBUGMODE__
+#ifdef HPTL_DEBUG
 	printf("[HPTLib] Started : Hz:%lu cicles:%lu tof:%lu\n", __hptl_hz, __hptl_cicles, __hptl_time);
 #endif
 
@@ -200,7 +204,7 @@ void hptl_sync(void)
 	__hptl_cicles = hptl_rdtsc();
 	__hptl_time = tmp.tv_sec * PRECCISION + tmp.tv_nsec / (1000000000ull / PRECCISION);
 
-#ifdef __HPTL__DEBUGMODE__
+#ifdef HPTL_DEBUG
 	printf("[HPTLib] Sync: cicles:%lu tof:%lu\n", __hptl_cicles, __hptl_time);
 #endif
 }

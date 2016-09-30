@@ -12,4 +12,7 @@
 //Is hptl debug on?
 #cmakedefine HPTL_DEBUG
 
+#cmakedefine HPTL_TSC
+#cmakedefine HPTL_CLOCKREALTIME
+
 #endif

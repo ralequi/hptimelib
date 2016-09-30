@@ -72,6 +72,12 @@ set_property(TARGET ${hptl_obj} PROPERTY POSITION_INDEPENDENT_CODE 1)
 add_library(hptl_shared SHARED $<TARGET_OBJECTS:hptl_obj>)
 add_library(hptl_static STATIC $<TARGET_OBJECTS:hptl_obj>)
 
+#Library Dependencies
+if(HPTL_CLOCKREALTIME)
+    target_link_libraries(hptl_shared rt)
+    target_link_libraries(hptl_static rt)
+endif()
+
 #Tests
 add_executable(deviationTest src/test/deviationTest)
 add_executable(exampleTest src/test/exampleTest)

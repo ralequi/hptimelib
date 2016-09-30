@@ -1,45 +1,27 @@
-ALL: lib/hptl.a lib/hptl.so Examples
+SRC=$(wildcard src/*.cpp src/tests/*.cpp src/*.c src/tests/*.c)
+INC=$(wildcard include/*.h include/*.hpp)
 
-Examples: examples/deviationTest examples/performanceTest examples/exampleTest
+products=build/hptl.so
 
-#Flags
-CFLAGS = -O3 -march=native -mtune=native -std=gnu11 -Wall -Werror -g -Iinclude -fPIC
-LFLAGS = -lrt
+all: install
 
-#Compiling...
-lib/hptl.so: lib obj/hptl.o
-	gcc $(CFLAGS) -shared -o lib/hptl.so src/hptl.c
+install: $(products)
 
-lib/hptl.a: lib obj/hptl.o
-	ar rcs lib/hptl.a  obj/hptl.o
+$(products): $(SRC) $(INC) build/Makefile
+	cd build; ${MAKE} --no-print-directory 
+	@touch $@
 
-obj/hptl.o: obj src/hptl.c include/hptl.h invariant_tsc
-	gcc $(CFLAGS) -c src/hptl.c -o obj/hptl.o
+build/Makefile: CMakeLists.txt | build $(SRC) $(INC)
+	cd build; cmake ..
 
-#Folders
-lib:
-	mkdir lib
+build:
+	mkdir -p build
 
-obj:
-	mkdir obj
-
-examples:
-	mkdir examples
-
-#clean
 clean:
-	rm -rf obj lib examples
+	rm -rf build
 
-#Examples
-examples/deviationTest: src/examples/deviationTest.c examples obj/hptl.o
-	gcc $(CFLAGS) $(LFLAGS) obj/hptl.o src/examples/deviationTest.c -o $@
+forceInclude: Config.cmake
+	rm build/CMakeCache.txt
 
-examples/performanceTest: src/examples/performanceTest.c examples obj/hptl.o
-	gcc $(CFLAGS) $(LFLAGS) obj/hptl.o src/examples/performanceTest.c -o $@
-
-examples/exampleTest: src/examples/performanceTest.c examples obj/hptl.o
-	gcc $(CFLAGS) $(LFLAGS) obj/hptl.o src/examples/exampleTest.c -o $@
-
-#Flag constant_tsc
-invariant_tsc:
-	@if grep -q constant_tsc /proc/cpuinfo ; then true; else echo "Constant_tsc is not present in your CPU. Hptl wont work correctly..." ; false; fi
+force: forceInclude | build
+	cd build && cmake .. && ${MAKE} --no-print-directory

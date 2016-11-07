@@ -7,6 +7,10 @@ Current version supports up to 1ns resolution, but 10ns resolution is recomended
 This library **only** works on **Intel Processors**.
 
 [![Build Status](https://travis-ci.org/ralequi/hptimelib.svg?branch=master)](https://travis-ci.org/ralequi/hptimelib)
+[![Coverage Status](https://img.shields.io/coveralls/ralequi/hptimelib.svg)](https://coveralls.io/r/ralequi/hptimelib)
+[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/ralequi/hptimelib/master/LICENSE.md)
+[![Github Releases](https://img.shields.io/github/release/ralequi/hptimelib.svg)](https://github.com/ralequi/hptimelib/releases)
+[![Github Issues](https://img.shields.io/github/issues/ralequi/hptimelib.svg)](https://github.com/ralequi/hptimelib/issues)
 
 # Objetive / Use-case
 

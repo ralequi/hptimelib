@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 3.0.2)
+cmake_minimum_required (VERSION 2.8.12)
 project (High_Performance_Timing_Library)
 # The version number.
 execute_process(

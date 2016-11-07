@@ -17,7 +17,7 @@ extern "C"
 #include <unistd.h>
 
 //Config file
-#include "config.h"
+#include "hptl_config.h"
 
 //Type used to store timing in hptlib
 	typedef uint64_t hptl_t;

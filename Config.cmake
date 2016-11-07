@@ -22,6 +22,6 @@ CHECK_LIBRARY_EXISTS(rt clock_gettime "time.h" HPTL_CLOCKREALTIME)
 #  "${PROJECT_BINARY_DIR}/include/config.hpp"
 #  )
 configure_file (
-  "${PROJECT_SOURCE_DIR}/include/config.h.in"
-  "${PROJECT_SOURCE_DIR}/include/config.h"
+  "${PROJECT_SOURCE_DIR}/include/hptl_config.h.in"
+  "${PROJECT_SOURCE_DIR}/include/hptl_config.h"
   )

@@ -20,7 +20,9 @@ This lib has been designed for High Performance applications with needs a High r
 
 - The library uses the cpu-instruction counter and creates a relation with the value returned by clock_gettime(CLOCK_REALTIME).
 It's important to note that the instruction counter is shared in a multi-core system (including NUMA) if the CPU flag `constant_tsc` is present.
-- This library also can wait for a certain nanoseconds actively, usefull for very-acurate real-time applications. 
+- This library also can wait for a certain nanoseconds actively, usefull for very-acurate real-time applications.
+- The library ensures strictly increasing timestamps.
+- The library ensures not repeated timestamps if resolution is at least  ![](http://www.sciweavers.org/tex2img.php?eq=10%5E%7B8%7D%20&bc=Transparent&fc=Black&im=png&fs=12&ff=arev&edit=0).  
 
 # Performance comparison 
 Tested on Intel(R) Xeon(R) CPU E5-2630 v2 and Fedora release 20 (Heisenbug)

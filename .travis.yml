@@ -43,4 +43,4 @@ matrix:
       env: COMPILER=gcc-6
 
 script:
-  - make CXX=$COMPILER CC=$COMPILER
+  - make CC=$COMPILER

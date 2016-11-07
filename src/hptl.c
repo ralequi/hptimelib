@@ -3,7 +3,6 @@
 hptl_t hptl_get_slow(void);
 
 /******************** VARIABLES ********************/
-
 uint64_t __hptl_time;
 uint64_t __hptl_cicles;
 static uint64_t __hptl_hz = 0;
@@ -33,7 +32,10 @@ typedef union {
 	};
 } _hptlru; //hptl rdtsc union.
 
-/** iDPDK FUNCTIONS **/
+/*************** PRIVATE FUNCTIONS ***************/
+struct timespec hptl_ts_diff(struct timespec start, struct timespec end, char *sign);
+
+/*************** iDPDK FUNCTIONS ***************/
 static inline uint64_t
 hptl_rdtsc(void)
 {
@@ -138,8 +140,6 @@ set_tsc_freq(void)
 	if (set_tsc_freq_from_clock() < 0) {
 		set_tsc_freq_linux();
 	}
-
-	//set_tsc_freq_fallback();
 }
 
 /********************* FUNCTIONS *********************/
@@ -186,6 +186,10 @@ int hptl_init(hptl_config *conf)
 
 	hptl_sync();
 
+	if (config.clockspeed == 0) {
+		hptl_calibrateHz(0);
+	}
+
 #ifdef HPTL_DEBUG
 	printf("[HPTLib] Started : Hz:%lu cicles:%lu tof:%lu\n", __hptl_hz, __hptl_cicles, __hptl_time);
 #endif
@@ -207,6 +211,84 @@ void hptl_sync(void)
 #ifdef HPTL_DEBUG
 	printf("[HPTLib] Sync: cicles:%lu tof:%lu\n", __hptl_cicles, __hptl_time);
 #endif
+}
+
+
+/*
+ * HZ calibration
+ * @param oldTime time obtained by hptl_get()
+ * @param newTime the newer time obtained by system precision-function
+ * @param diffTime the time between executions, example if hptl_get takes 17ns and clockgettime 22ns, 5 (22-17) should be used
+ * @return the hz modified
+ */
+int hptl_calibrateHz(int diffTime){
+	struct timespec newTime;
+	
+	//get the hptltime
+	unsigned long long tmp;
+	volatile unsigned long long Oflag;
+
+	_hptlru tsc;
+
+	hptl_waitns(750000000);
+
+	asm volatile("rdtsc" :
+				 "=a"(tsc.lo_32),
+				 "=d"(tsc.hi_32));
+
+	tmp = ((tsc.tsc_64 - __hptl_cicles) * PRECCISION);
+
+	overflowflag(Oflag)
+
+	if (Oflag) {
+		hptl_sync();
+		return hptl_calibrateHz(diffTime);
+	}
+
+	//calibrates the time provided by diffTime
+	clock_gettime(CLOCK_REALTIME, &newTime);
+	newTime.tv_nsec+=diffTime;
+	int hzCalibrated = 0;
+
+	unsigned long long newhptl;
+	struct timespec error, errorPrima;
+	char sign, signPrima;
+
+	errorPrima = hptl_ts_diff(hptl_timespec((tmp / __hptl_hz) + __hptl_time), newTime, &signPrima);
+
+	do {
+		error = errorPrima;
+		sign = signPrima;
+		hzCalibrated ++;
+
+		newhptl = (tmp / (__hptl_hz + hzCalibrated)) + __hptl_time;
+		errorPrima = hptl_ts_diff(hptl_timespec(newhptl), newTime, &signPrima);
+
+		/*printf("\n Was %c %lu s, %3lu ms, %3lu us, %3lu ns ; now %c %lu s, %3lu ms, %3lu us, %3lu ns\n",
+			   sign,
+			   error.tv_sec,
+			   (error.tv_nsec / 1000000000L) % 1000L,
+			   (error.tv_nsec / 1000L) % 1000L,
+			   error.tv_nsec % 1000L,
+			   signPrima,
+			   errorPrima.tv_sec,
+			   (errorPrima.tv_nsec / 1000000000L) % 1000L,
+			   (errorPrima.tv_nsec / 1000L) % 1000L,
+			   errorPrima.tv_nsec % 1000L
+			    );*/
+	}while(errorPrima.tv_nsec <= error.tv_nsec && errorPrima.tv_nsec > 128);
+
+	do {
+		error = errorPrima;
+		signPrima = sign;
+		hzCalibrated --;
+
+		newhptl = (tmp / (__hptl_hz + hzCalibrated)) + __hptl_time;
+		errorPrima = hptl_ts_diff(hptl_timespec(newhptl), newTime, &signPrima);
+	}while(errorPrima.tv_nsec <= error.tv_nsec && errorPrima.tv_nsec > 128);
+
+	__hptl_hz += hzCalibrated;
+	return hzCalibrated;
 }
 
 hptl_t hptl_get(void)
@@ -291,6 +373,40 @@ struct timeval hptl_timeval(hptl_t u64) {
 uint64_t hptl_ntimestamp(hptl_t hptltime)
 {
 	return hptltime * (1000000000ull / PRECCISION);
+}
+
+struct timespec hptl_ts_diff(struct timespec start, struct timespec end, char *sign) {
+	struct timespec temp;
+
+	if (start.tv_sec > end.tv_sec) {
+		temp = end;
+		end = start;
+		start = temp;
+
+		if (sign != NULL) {
+			*sign = '-';
+		}
+	} else if (start.tv_sec == end.tv_sec && start.tv_nsec > end.tv_nsec) {
+		temp = end;
+		end = start;
+		start = temp;
+
+		if (sign != NULL) {
+			*sign = '-';
+		}
+	} else if (sign != NULL) {
+		*sign = '+';
+	}
+
+	if ((end.tv_nsec - start.tv_nsec) < 0) {
+		temp.tv_sec = end.tv_sec - start.tv_sec - 1;
+		temp.tv_nsec = 1000000000ull + end.tv_nsec - start.tv_nsec;
+	} else {
+		temp.tv_sec = end.tv_sec - start.tv_sec;
+		temp.tv_nsec = end.tv_nsec - start.tv_nsec;
+	}
+
+	return temp;
 }
 
 /***********

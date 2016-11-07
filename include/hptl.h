@@ -53,6 +53,13 @@ extern "C"
 	void hptl_sync(void);
 
 	/**
+	 * HZ calibration
+	 * @param diffTime the time between executions, example if hptl_get takes 17ns and clockgettime 22ns, 5 (22-17) should be used
+	 * @return the hz modified
+	 **/
+	int hptl_calibrateHz(int diffTime);
+
+	/**
 	 * Gets current time
 	 **/
 	hptl_t hptl_get(void);

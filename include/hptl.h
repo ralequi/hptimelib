@@ -19,6 +19,11 @@ extern "C"
 //Config file
 #include "hptl_config.h"
 
+//check for Errors
+#ifndef HPTL_TSC
+#error constant_tsc is not present
+#endif
+
 //Type used to store timing in hptlib
 	typedef uint64_t hptl_t;
 

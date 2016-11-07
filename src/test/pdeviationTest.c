@@ -11,7 +11,7 @@ extern uint64_t __hptl_hz;
 int main(/*int argc, char **argv*/)
 {
 	hptl_config confhptl;
-	confhptl.precision = 9;
+	confhptl.precision = 8;
 	confhptl.clockspeed = 0;
 
 	hptl_init(&confhptl);
@@ -22,7 +22,7 @@ int main(/*int argc, char **argv*/)
 
 	struct timespec cmtime, rt, df;
 
-	printf("[Precised] Deviation Test started...[%lu]\n", hptl_get());
+	printf("[Precised] Deviation Test started [resolution = %lu]...[%lu]\n", hptl_getres(), hptl_get());
 
 	for (j = 0; j < TESTREPEAT; j++) {
 		printf("Test #%lu of %lu...", j + 1, TESTREPEAT);

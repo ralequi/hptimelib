@@ -20,7 +20,7 @@ int main(/*int argc, char **argv*/)
 
 	struct timespec cmtime, rt, df;
 
-	printf("Deviation Test started...[%lu]\n", hptl_get());
+	printf("Deviation Test started [low-resolution = %lu]...[%lu]\n", hptl_getres(), hptl_get());
 
 	for (j = 0; j < TESTREPEAT; j++) {
 		printf("Test #%lu of %lu...", j + 1, TESTREPEAT);

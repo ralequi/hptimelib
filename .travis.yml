@@ -1,0 +1,46 @@
+language: cpp
+
+dist: trusty
+sudo: required
+
+matrix:
+  include:
+    - compiler: gcc
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - sourceline: 'ppa:mc3man/trusty-media'
+          packages:
+            - gcc-4.9
+            - libopencv-dev
+            - libnfc-dev
+            - ffmpeg
+      env: COMPILER=gcc-4.9
+    - compiler: gcc
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - sourceline: 'ppa:mc3man/trusty-media'
+          packages:
+            - gcc-5
+            - libopencv-dev
+            - libnfc-dev
+            - ffmpeg
+      env: COMPILER=gcc-5
+    - compiler: gcc
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - sourceline: 'ppa:mc3man/trusty-media'
+          packages:
+            - gcc-6
+            - libopencv-dev
+            - libnfc-dev
+            - ffmpeg
+      env: COMPILER=gcc-6
+
+script:
+  - make CXX=$COMPILER CC=$COMPILER

@@ -11,7 +11,7 @@ extern uint64_t __hptl_hz;
 int main(/*int argc, char **argv*/)
 {
 	hptl_config confhptl;
-	confhptl.precision = 8;
+	confhptl.precision = 9;
 	confhptl.clockspeed = 0;
 
 	hptl_init(&confhptl);

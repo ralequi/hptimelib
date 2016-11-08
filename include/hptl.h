@@ -2,8 +2,7 @@
 #define __HPTLIB__H__
 
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
 
 #include <inttypes.h>
@@ -16,86 +15,93 @@ extern "C"
 #include <sys/syscall.h>
 #include <unistd.h>
 
-//Config file
+// Config file
 #include "hptl_config.h"
 
-//check for Errors
+// check for Errors
 #ifndef HPTL_TSC
 #error constant_tsc is not present
 #endif
 
-//Type used to store timing in hptlib
-	typedef uint64_t hptl_t;
+#ifdef HPTL_ONLYCLOCKREALTIME
+#ifndef HPTL_CLOCKREALTIME
+#error HPTL_ONLYCLOCKREALTIME does not work if HPTL_CLOCKREALTIME does not work (rt library is not present).
+#endif
+#endif
 
-//Configuration structure
-	typedef struct {
-		/* Sets the precision of the hptl.
-		 * Some examples of possible values are:
-		 * 9 sets de precission to ns
-		 * 8 sets de precission to tens of ns
-		 * 7 sets de precission to hundreds of ns
-		 * 6 sets de precission to us
-		 * 3 sets de precission to ms
-		 * 0 sets de precission to s
-		 */
-		uint8_t precision;
-		/* CPU clock speed in Hz.
-		 * if unknown, set the value to 0 and will be autodetected
-		 */
-		uint64_t clockspeed;
-	} hptl_config;
+// Type used to store timing in hptlib
+typedef uint64_t hptl_t;
 
-	/**
-	 * Module initialization
-	 * @param conf configuration. If NULL, default configuration is used.
-	 * @return 0 if correct, -1 if there is an error with configuration.
-	 **/
-	int hptl_init(hptl_config *conf);
+// Configuration structure
+typedef struct {
+	/* Sets the precision of the hptl.
+	 * Some examples of possible values are:
+	 * 9 sets de precission to ns
+	 * 8 sets de precission to tens of ns
+	 * 7 sets de precission to hundreds of ns
+	 * 6 sets de precission to us
+	 * 3 sets de precission to ms
+	 * 0 sets de precission to s
+	 */
+	uint8_t precision;
+	/* CPU clock speed in Hz.
+	 * if unknown, set the value to 0 and will be autodetected
+	 */
+	uint64_t clockspeed;
+} hptl_config;
 
-	/**
-	 * Clock Syncronization with RTSC
-	 **/
-	void hptl_sync(void);
+/**
+ * Module initialization
+ * @param conf configuration. If NULL, default configuration is used.
+ * @return 0 if correct, -1 if there is an error with configuration.
+ **/
+int hptl_init (hptl_config *conf);
 
-	/**
-	 * HZ calibration
-	 * @param diffTime the time between executions, example if hptl_get takes 17ns and clockgettime 22ns, 5 (22-17) should be used
-	 * @return the hz modified
-	 **/
-	int hptl_calibrateHz(int diffTime);
+/**
+ * Clock Syncronization with RTSC
+ **/
+void hptl_sync (void);
 
-	/**
-	 * Gets current time
-	 **/
-	hptl_t hptl_get(void);
+/**
+ * HZ calibration
+ * @param diffTime the time between executions, example if hptl_get takes 17ns
+ *and clockgettime 22ns, 5 (22-17) should be used
+ * @return the hz modified
+ **/
+int hptl_calibrateHz (int diffTime);
 
-	/**
-	 * Return the resolution in terms of ns
-	 **/
-	uint64_t hptl_getres(void);
+/**
+ * Gets current time
+ **/
+hptl_t hptl_get (void);
 
-	/**
-	 * Wait certain ns actively.
-	 * hptl should be initialized first.
-	 **/
-	void hptl_waitns(uint64_t ns);
+/**
+ * Return the resolution in terms of ns
+ **/
+uint64_t hptl_getres (void);
 
-	/** UTILS **/
+/**
+ * Wait certain ns actively.
+ * hptl should be initialized first.
+ **/
+void hptl_waitns (uint64_t ns);
 
-	/**
-	 * Converts from HPTLib format to timespec format
-	 **/
-	struct timespec hptl_timespec(hptl_t hptltime);
+/** UTILS **/
 
-	/**
-	 * Converts from HPTLib format to timeval format
-	 **/
-	struct timeval hptl_timeval(hptl_t hptltime);
+/**
+ * Converts from HPTLib format to timespec format
+ **/
+struct timespec hptl_timespec (hptl_t hptltime);
 
-	/**
-	 * Converts from HPTLib format to ns from 01 Jan 1970
-	 **/
-	uint64_t hptl_ntimestamp(hptl_t hptltime);
+/**
+ * Converts from HPTLib format to timeval format
+ **/
+struct timeval hptl_timeval (hptl_t hptltime);
+
+/**
+ * Converts from HPTLib format to ns from 01 Jan 1970
+ **/
+uint64_t hptl_ntimestamp (hptl_t hptltime);
 
 #ifdef __cplusplus
 }

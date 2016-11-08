@@ -1,0 +1,15 @@
+BasedOnStyle: Google
+
+IndentWidth: 4
+TabWidth: 4
+UseTab: ForIndentation
+
+BreakBeforeBraces: Attach
+IndentCaseLabels: true
+SpaceBeforeParens: Always
+
+AlignAfterOpenBracket: true
+AlignEscapedNewlinesLeft: true
+AlignConsecutiveAssignments: true
+AlignOperands: true
+AlignTrailingComments: true

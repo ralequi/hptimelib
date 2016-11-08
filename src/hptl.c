@@ -3,7 +3,7 @@
 /******************** VARIABLES ********************/
 uint64_t __hptl_time;
 uint64_t __hptl_cicles;
-static uint64_t __hptl_hz = 0;
+uint64_t __hptl_hz = 0;
 static uint64_t __hptl_precision;
 
 #define PRECCISION (__hptl_precision)  // = 100ns

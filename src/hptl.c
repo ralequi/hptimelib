@@ -280,8 +280,8 @@ int hptl_calibrateHz (int diffTime) {
 	} while (errorPrima.tv_nsec <= error.tv_nsec && errorPrima.tv_nsec > 128);
 
 	do {
-		error     = errorPrima;
-		signPrima = sign;
+		error = errorPrima;
+		sign  = signPrima;
 		hzCalibrated--;
 
 		newhptl = (tmp / (__hptl_hz + hzCalibrated)) + __hptl_time;

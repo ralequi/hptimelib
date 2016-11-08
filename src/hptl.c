@@ -1,7 +1,5 @@
 #include "hptl.h"
 
-hptl_t hptl_get_slow (void);
-
 /******************** VARIABLES ********************/
 uint64_t __hptl_time;
 uint64_t __hptl_cicles;
@@ -18,13 +16,13 @@ static uint64_t __hptl_precision;
 
 /********************* MACROS *********************/
 #define overflowflag(isOverflow)           \
-	{                                      \
+	do {                                   \
 		asm volatile(                      \
 		    "pushf ;"                      \
 		    "pop %%rax"                    \
 		    : "=a"(isOverflow));           \
 		isOverflow = (isOverflow & 0x800); \
-	}
+	} while (0)
 
 /*************** STRUCTURES & UNIONS ***************/
 typedef union {
@@ -40,6 +38,8 @@ struct timespec hptl_ts_diff (struct timespec start, struct timespec end,
                               char *sign);
 
 /*************** iDPDK FUNCTIONS ***************/
+#ifndef HPTL_ONLYLINUXAPI
+// Do not define satatic structures
 static inline uint64_t hptl_rdtsc (void) {
 	_hptlru tsc;
 
@@ -47,6 +47,7 @@ static inline uint64_t hptl_rdtsc (void) {
 
 	return tsc.tsc_64;
 }
+
 static int set_tsc_freq_from_clock (void) {
 #ifdef CLOCK_MONOTONIC_RAW
 #define NS_PER_SEC 1E9
@@ -138,11 +139,11 @@ static void set_tsc_freq (void) {
 		set_tsc_freq_linux ();
 	}
 }
+#endif
 
 /********************* FUNCTIONS *********************/
 
 int hptl_init (hptl_config *conf) {
-#ifdef HPTL_ONLYCLOCKREALTIME
 	hptl_config config;
 	int i, k = 1;
 
@@ -166,6 +167,18 @@ int hptl_init (hptl_config *conf) {
 		return -1;
 	}
 
+	// config precision
+	for (i = 0; i < config.precision; i++) {
+		k *= 10;
+	}
+
+	PRECCISION = k;
+
+#ifdef HPTL_ONLYLINUXAPI
+// do nothing more specific
+#else
+	// Specific and advanced options
+
 	// load clockspeed
 	if (config.clockspeed == 0) {
 		set_tsc_freq ();
@@ -173,13 +186,6 @@ int hptl_init (hptl_config *conf) {
 	} else {
 		__hptl_hz = config.clockspeed;
 	}
-
-	// config precision
-	for (i = 0; i < config.precision; i++) {
-		k *= 10;
-	}
-
-	PRECCISION = k;
 
 	hptl_sync ();
 
@@ -193,10 +199,13 @@ int hptl_init (hptl_config *conf) {
 #endif
 #endif
 
-	return 0; //always return 0
+	return 0;  // always return 0
 }
 
 void hptl_sync (void) {
+#ifdef HPTL_ONLYLINUXAPI
+// do nothing
+#else
 	struct timespec tmp;
 
 	if (clock_gettime (CLOCK_REALTIME, &tmp) != 0) {
@@ -210,6 +219,7 @@ void hptl_sync (void) {
 #ifdef HPTL_DEBUG
 	printf ("[HPTLib] Sync: cicles:%lu tof:%lu\n", __hptl_cicles, __hptl_time);
 #endif
+#endif
 }
 
 /*
@@ -221,7 +231,11 @@ void hptl_sync (void) {
  * @return the hz modified
  */
 int hptl_calibrateHz (int diffTime) {
-#ifdef HPTL_ONLYCLOCKREALTIME
+#ifdef HPTL_ONLYLINUXAPI
+	// do nothing
+	(void)diffTime;
+	return 0;
+#else
 	struct timespec newTime;
 
 	// get the hptltime
@@ -236,9 +250,9 @@ int hptl_calibrateHz (int diffTime) {
 
 	tmp = ((tsc.tsc_64 - __hptl_cicles) * PRECCISION);
 
-	overflowflag (Oflag)
+	overflowflag (Oflag);
 
-	    if (Oflag) {
+	if (Oflag) {
 		hptl_sync ();
 		return hptl_calibrateHz (diffTime);
 	}
@@ -250,19 +264,16 @@ int hptl_calibrateHz (int diffTime) {
 
 	unsigned long long newhptl;
 	struct timespec error, errorPrima;
-	char sign, signPrima;
 
 	errorPrima = hptl_ts_diff (hptl_timespec ((tmp / __hptl_hz) + __hptl_time),
-	                           newTime, &signPrima);
+	                           newTime, NULL);
 
 	do {
 		error = errorPrima;
-		sign  = signPrima;
 		hzCalibrated++;
 
-		newhptl = (tmp / (__hptl_hz + hzCalibrated)) + __hptl_time;
-		errorPrima =
-		    hptl_ts_diff (hptl_timespec (newhptl), newTime, &signPrima);
+		newhptl    = (tmp / (__hptl_hz + hzCalibrated)) + __hptl_time;
+		errorPrima = hptl_ts_diff (hptl_timespec (newhptl), newTime, NULL);
 
 		/*printf("\n Was %c %lu s, %3lu ms, %3lu us, %3lu ns ; now %c
 		   %lu s, %3lu ms, %3lu us, %3lu ns\n",
@@ -277,26 +288,35 @@ int hptl_calibrateHz (int diffTime) {
 		           (errorPrima.tv_nsec / 1000L) % 1000L,
 		           errorPrima.tv_nsec % 1000L
 		            );*/
-	} while (errorPrima.tv_nsec <= error.tv_nsec && errorPrima.tv_nsec > 128);
+	} while (errorPrima.tv_nsec <= error.tv_nsec && errorPrima.tv_nsec > 16);
 
-	do {
-		error = errorPrima;
-		sign  = signPrima;
-		hzCalibrated--;
+	if (hzCalibrated == 1) {  // Execute only, if previous execution does not
+		                      // calibrated (but descalibrated).
+		do {
+			error = errorPrima;
+			hzCalibrated--;
 
-		newhptl = (tmp / (__hptl_hz + hzCalibrated)) + __hptl_time;
-		errorPrima =
-		    hptl_ts_diff (hptl_timespec (newhptl), newTime, &signPrima);
-	} while (errorPrima.tv_nsec <= error.tv_nsec && errorPrima.tv_nsec > 128);
+			newhptl    = (tmp / (__hptl_hz + hzCalibrated)) + __hptl_time;
+			errorPrima = hptl_ts_diff (hptl_timespec (newhptl), newTime, NULL);
+		} while (errorPrima.tv_nsec <= error.tv_nsec &&
+		         errorPrima.tv_nsec > 16);
+	}
 
 	__hptl_hz += hzCalibrated;
 	return hzCalibrated;
-#else
-	return 0;
 #endif
 }
 
 hptl_t hptl_get (void) {
+#ifdef HPTL_ONLYLINUXAPI
+	// Wraper mode
+	struct timespec cmtime;
+	clock_gettime (CLOCK_REALTIME, &cmtime);
+	hptl_t ret = cmtime.tv_nsec / (1000000000ull / PRECCISION) +
+	             cmtime.tv_sec * PRECCISION;
+	return ret;
+#else
+	// Advanced high-eficiency mode
 	unsigned long long tmp;
 	volatile unsigned long long Oflag;
 
@@ -306,14 +326,15 @@ hptl_t hptl_get (void) {
 
 	tmp = ((tsc.tsc_64 - __hptl_cicles) * PRECCISION);
 
-	overflowflag (Oflag)
+	overflowflag (Oflag);
 
-	    if (Oflag) {
+	if (Oflag) {
 		hptl_sync ();
 		return hptl_get ();
 	}
 
 	return (tmp / __hptl_hz) + __hptl_time;
+#endif
 }
 
 /**
@@ -325,6 +346,12 @@ uint64_t hptl_getres (void) { return 1000000000ull / PRECCISION; }
  * Wait certain ns actively
  **/
 void hptl_waitns (uint64_t ns) {
+#ifdef HPTL_ONLYLINUXAPI
+	struct timespec sleeptime;
+	sleeptime.tv_sec = ns / 1000000000ull;
+	sleeptime.tv_nsec = ns % 1000000000ull;
+	nanosleep (&sleeptime, NULL);
+#else
 	hptl_t start, end;
 
 	// start = hptl_rdtsc();
@@ -338,6 +365,7 @@ void hptl_waitns (uint64_t ns) {
 		// start = hptl_rdtsc();
 		start = hptl_get ();
 	} while (start < end);
+#endif
 }
 
 /**
@@ -405,24 +433,4 @@ struct timespec hptl_ts_diff (struct timespec start, struct timespec end,
 	}
 
 	return temp;
-}
-
-/***********
- * Obsolete...
- ***********/
-hptl_t hptl_get_slow (void) {
-	double tmp;
-
-	union {
-		uint64_t tsc_64;
-		struct {
-			uint32_t lo_32;
-			uint32_t hi_32;
-		};
-	} tsc;
-
-	asm volatile("rdtsc" : "=a"(tsc.lo_32), "=d"(tsc.hi_32));
-
-	tmp = ((tsc.tsc_64 - __hptl_cicles) * (double)PRECCISION);
-	return (tmp / __hptl_hz) + __hptl_time;
 }

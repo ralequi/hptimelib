@@ -23,9 +23,9 @@ extern "C" {
 #error constant_tsc is not present
 #endif
 
-#ifdef HPTL_ONLYCLOCKREALTIME
+#ifdef HPTL_ONLYLINUXAPI
 #ifndef HPTL_CLOCKREALTIME
-#error HPTL_ONLYCLOCKREALTIME does not work if HPTL_CLOCKREALTIME does not work (rt library is not present).
+#error HPTL_ONLYLINUXAPI does not work if HPTL_CLOCKREALTIME does not work (rt library is not present).
 #endif
 #endif
 

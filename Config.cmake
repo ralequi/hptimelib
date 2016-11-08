@@ -3,7 +3,7 @@
 #################################
 
 option(HPTL_DEBUG "Enable HPTL debug text" ON)
-option(HPTL_ONLYCLOCKREALTIME "Disables custom HPTL functionality and compiles as a CLOCKREALTIME wrapper" ON)
+option(HPTL_ONLYLINUXAPI "Disables custom HPTL functionality and compiles as a Linux-Time wrapper" OFF)
 #set   (HPTL_DEBUG "https" CACHE STRING "The server api URI-protocol")
 
 #check RDTSC (only Intel)

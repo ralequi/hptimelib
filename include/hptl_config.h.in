@@ -14,6 +14,6 @@
 
 #cmakedefine HPTL_TSC
 #cmakedefine HPTL_CLOCKREALTIME
-#cmakedefine HPTL_ONLYCLOCKREALTIME
+#cmakedefine HPTL_ONLYLINUXAPI
 
 #endif

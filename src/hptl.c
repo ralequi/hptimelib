@@ -34,8 +34,7 @@ typedef union {
 } _hptlru;  // hptl rdtsc union.
 
 /*************** PRIVATE FUNCTIONS ***************/
-struct timespec hptl_ts_diff (struct timespec start, struct timespec end,
-                              char *sign);
+struct timespec hptl_ts_diff (struct timespec start, struct timespec end, char *sign);
 
 /*************** iDPDK FUNCTIONS ***************/
 #ifndef HPTL_ONLYLINUXAPI
@@ -56,8 +55,7 @@ static int set_tsc_freq_from_clock (void) {
 	printf ("[HPTLib] Using CLOCK_MONOTONIC_RAW to obtain CPU Hz...\n");
 #endif
 
-	struct timespec sleeptime = {.tv_sec = 0,
-	                             .tv_nsec = 500000000}; /* 1/2 second */
+	struct timespec sleeptime = {.tv_sec = 0, .tv_nsec = 500000000}; /* 1/2 second */
 
 	struct timespec t_start, t_end;
 
@@ -99,8 +97,7 @@ static void set_tsc_freq_linux (void) {
 		exit (-1);
 	}
 
-	sprintf (tmp, "/sys/devices/system/cpu/cpu%d/cpufreq/cpuinfo_cur_freq",
-	         cpu);
+	sprintf (tmp, "/sys/devices/system/cpu/cpu%d/cpufreq/cpuinfo_cur_freq", cpu);
 
 #ifdef HPTL_DEBUG
 	printf ("[HPTLib] Assuming HPTLib is going to run on %d...\n", cpu);
@@ -194,8 +191,8 @@ int hptl_init (hptl_config *conf) {
 	}
 
 #ifdef HPTL_DEBUG
-	printf ("[HPTLib] Started : Hz:%lu cicles:%lu tof:%lu\n", __hptl_hz,
-	        __hptl_cicles, __hptl_time);
+	printf ("[HPTLib] Started : Hz:%lu cicles:%lu tof:%lu\n", __hptl_hz, __hptl_cicles,
+	        __hptl_time);
 #endif
 #endif
 
@@ -213,8 +210,7 @@ void hptl_sync (void) {
 	}
 
 	__hptl_cicles = hptl_rdtsc ();
-	__hptl_time =
-	    tmp.tv_sec * PRECCISION + tmp.tv_nsec / (1000000000ull / PRECCISION);
+	__hptl_time = tmp.tv_sec * PRECCISION + tmp.tv_nsec / (1000000000ull / PRECCISION);
 
 #ifdef HPTL_DEBUG
 	printf ("[HPTLib] Sync: cicles:%lu tof:%lu\n", __hptl_cicles, __hptl_time);
@@ -265,8 +261,7 @@ int hptl_calibrateHz (int diffTime) {
 	unsigned long long newhptl;
 	struct timespec error, errorPrima;
 
-	errorPrima = hptl_ts_diff (hptl_timespec ((tmp / __hptl_hz) + __hptl_time),
-	                           newTime, NULL);
+	errorPrima = hptl_ts_diff (hptl_timespec ((tmp / __hptl_hz) + __hptl_time), newTime, NULL);
 
 	do {
 		error = errorPrima;
@@ -298,8 +293,7 @@ int hptl_calibrateHz (int diffTime) {
 
 			newhptl    = (tmp / (__hptl_hz + hzCalibrated)) + __hptl_time;
 			errorPrima = hptl_ts_diff (hptl_timespec (newhptl), newTime, NULL);
-		} while (errorPrima.tv_nsec <= error.tv_nsec &&
-		         errorPrima.tv_nsec > 16);
+		} while (errorPrima.tv_nsec <= error.tv_nsec && errorPrima.tv_nsec > 16);
 	}
 
 	__hptl_hz += hzCalibrated;
@@ -312,8 +306,7 @@ hptl_t hptl_get (void) {
 	// Wraper mode
 	struct timespec cmtime;
 	clock_gettime (CLOCK_REALTIME, &cmtime);
-	hptl_t ret = cmtime.tv_nsec / (1000000000ull / PRECCISION) +
-	             cmtime.tv_sec * PRECCISION;
+	hptl_t ret = cmtime.tv_nsec / (1000000000ull / PRECCISION) + cmtime.tv_sec * PRECCISION;
 	return ret;
 #else
 	// Advanced high-eficiency mode
@@ -348,7 +341,7 @@ uint64_t hptl_getres (void) { return 1000000000ull / PRECCISION; }
 void hptl_waitns (uint64_t ns) {
 #ifdef HPTL_ONLYLINUXAPI
 	struct timespec sleeptime;
-	sleeptime.tv_sec = ns / 1000000000ull;
+	sleeptime.tv_sec  = ns / 1000000000ull;
 	sleeptime.tv_nsec = ns % 1000000000ull;
 	nanosleep (&sleeptime, NULL);
 #else
@@ -374,9 +367,8 @@ void hptl_waitns (uint64_t ns) {
 struct timespec hptl_timespec (hptl_t u64) {
 	struct timespec tmp;
 
-	tmp.tv_sec = u64 / PRECCISION;
-	tmp.tv_nsec =
-	    (u64 - (tmp.tv_sec * PRECCISION)) * (1000000000ull / PRECCISION);
+	tmp.tv_sec  = u64 / PRECCISION;
+	tmp.tv_nsec = (u64 - (tmp.tv_sec * PRECCISION)) * (1000000000ull / PRECCISION);
 
 	return tmp;
 }
@@ -396,12 +388,9 @@ struct timeval hptl_timeval (hptl_t u64) {
 /**
  * Converts from HPTLib format to ns from 01 Jan 1970
  **/
-uint64_t hptl_ntimestamp (hptl_t hptltime) {
-	return hptltime * (1000000000ull / PRECCISION);
-}
+uint64_t hptl_ntimestamp (hptl_t hptltime) { return hptltime * (1000000000ull / PRECCISION); }
 
-struct timespec hptl_ts_diff (struct timespec start, struct timespec end,
-                              char *sign) {
+struct timespec hptl_ts_diff (struct timespec start, struct timespec end, char *sign) {
 	struct timespec temp;
 
 	if (start.tv_sec > end.tv_sec) {

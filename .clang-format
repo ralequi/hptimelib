@@ -13,3 +13,5 @@ AlignEscapedNewlinesLeft: true
 AlignConsecutiveAssignments: true
 AlignOperands: true
 AlignTrailingComments: true
+
+ColumnLimit: 100

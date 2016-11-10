@@ -1,18 +1,12 @@
 #include "hptl.h"
 
-/******************** VARIABLES ********************/
-uint64_t __hptl_time;
-uint64_t __hptl_cicles;
-uint64_t __hptl_hz = 0;
-static uint64_t __hptl_precision;
+// Old format convertion
+#define __hptl_time (clk->__hptl_time)
+#define __hptl_cicles (clk->__hptl_cicles)
+#define __hptl_hz (clk->__hptl_hz)
+#define __hptl_precision (clk->__hptl_precision)
 
-#define PRECCISION (__hptl_precision)  // = 100ns
-//#define PRECCISION (100000000ull) // = 100ns
-// 2^64 =        18.446.744.073.709.551.616
-//              36.450.791.397.000.000.000
-//                      xx.xxx.xxx.xxx.x00.000.000
-//                      18.446.744.073.7 ciclos ~ 76.8s @ 2.4hz
-//                       3.647.989.712.700.000.000
+#define PRECCISION (__hptl_precision)
 
 /********************* MACROS *********************/
 #define overflowflag(isOverflow)           \
@@ -47,7 +41,7 @@ static inline uint64_t hptl_rdtsc (void) {
 	return tsc.tsc_64;
 }
 
-static int set_tsc_freq_from_clock (void) {
+static int set_tsc_freq_from_clock (hptl_clock *clk) {
 #ifdef CLOCK_MONOTONIC_RAW
 #define NS_PER_SEC 1E9
 	uint64_t ns, end, start;
@@ -77,7 +71,7 @@ static int set_tsc_freq_from_clock (void) {
 	return -1;
 }
 
-static void set_tsc_freq_linux (void) {
+static void set_tsc_freq_linux (hptl_clock *clk) {
 	char tmp[100];  //"/sys/devices/system/cpu/cpuXXX/cpufreq/cpuinfo_cur_freq";
 	volatile int i;
 	int status;
@@ -131,16 +125,16 @@ static void set_tsc_freq_linux (void) {
  * 3. Lastly, if neither of the above can be used, just sleep for 1 second and
  * tune off that, printing a warning about inaccuracy of timing
  */
-static void set_tsc_freq (void) {
-	if (set_tsc_freq_from_clock () < 0) {
-		set_tsc_freq_linux ();
+static void set_tsc_freq (hptl_clock *clk) {
+	if (set_tsc_freq_from_clock (clk) < 0) {
+		set_tsc_freq_linux (clk);
 	}
 }
 #endif
 
 /********************* FUNCTIONS *********************/
 
-int hptl_init (hptl_config *conf) {
+int hptl_initclk (hptl_clock *clk, hptl_config *conf) {
 	hptl_config config;
 	int i, k = 1;
 
@@ -178,7 +172,7 @@ int hptl_init (hptl_config *conf) {
 
 	// load clockspeed
 	if (config.clockspeed == 0) {
-		set_tsc_freq ();
+		set_tsc_freq (clk);
 
 	} else {
 		__hptl_hz = config.clockspeed;
@@ -199,7 +193,7 @@ int hptl_init (hptl_config *conf) {
 	return 0;  // always return 0
 }
 
-void hptl_sync (void) {
+void hptl_syncclk (hptl_clock *clk) {
 #ifdef HPTL_ONLYLINUXAPI
 // do nothing
 #else
@@ -226,7 +220,7 @@ void hptl_sync (void) {
  * and clockgettime 22ns, 5 (22-17) should be used
  * @return the hz modified
  */
-int hptl_calibrateHz (int diffTime) {
+int hptl_calibrate (hptl_clock *clk, int diffTime) {
 #ifdef HPTL_ONLYLINUXAPI
 	// do nothing
 	(void)diffTime;
@@ -301,7 +295,7 @@ int hptl_calibrateHz (int diffTime) {
 #endif
 }
 
-hptl_t hptl_get (void) {
+hptl_t hptl_getTime (hptl_clock *clk) {
 #ifdef HPTL_ONLYLINUXAPI
 	// Wraper mode
 	struct timespec cmtime;
@@ -333,12 +327,12 @@ hptl_t hptl_get (void) {
 /**
  * Return the resolution in terms of ns
  **/
-uint64_t hptl_getres (void) { return 1000000000ull / PRECCISION; }
+uint64_t hptl_getclkres (hptl_clock *clk) { return 1000000000ull / PRECCISION; }
 
 /**
  * Wait certain ns actively
  **/
-void hptl_waitns (uint64_t ns) {
+void hptl_wait (uint64_t ns) {
 #ifdef HPTL_ONLYLINUXAPI
 	struct timespec sleeptime;
 	sleeptime.tv_sec  = ns / 1000000000ull;
@@ -364,7 +358,7 @@ void hptl_waitns (uint64_t ns) {
 /**
  * Converts from realtime format to timespect format
  **/
-struct timespec hptl_timespec (hptl_t u64) {
+struct timespec hptl_clktimespec (hptl_clock *clk, hptl_t u64) {
 	struct timespec tmp;
 
 	tmp.tv_sec  = u64 / PRECCISION;
@@ -376,7 +370,7 @@ struct timespec hptl_timespec (hptl_t u64) {
 /**
  * Converts from realtime format to timeval format
  **/
-struct timeval hptl_timeval (hptl_t u64) {
+struct timeval hptl_clktimeval (hptl_clock *clk, hptl_t u64) {
 	struct timeval tmp;
 
 	tmp.tv_sec  = u64 / PRECCISION;
@@ -388,7 +382,9 @@ struct timeval hptl_timeval (hptl_t u64) {
 /**
  * Converts from HPTLib format to ns from 01 Jan 1970
  **/
-uint64_t hptl_ntimestamp (hptl_t hptltime) { return hptltime * (1000000000ull / PRECCISION); }
+uint64_t hptl_clkntimestamp (hptl_clock *clk, hptl_t hptltime) {
+	return hptltime * (1000000000ull / PRECCISION);
+}
 
 struct timespec hptl_ts_diff (struct timespec start, struct timespec end, char *sign) {
 	struct timespec temp;

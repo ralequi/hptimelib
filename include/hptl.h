@@ -1,3 +1,18 @@
+/**
+  Language: C
+
+  License: MIT License
+  (c) HPCN 2014-2017
+
+  Author: Rafael Leira
+  E-Mail: rafael.leira@uam.es
+
+  Description: High Performance Timing Library, that uses RTC counter.
+
+  Thread Safe: Yes
+
+  Platform Dependencies: Linux-like and Intel Processor
+*/
 #ifndef __HPTLIB__H__
 #define __HPTLIB__H__
 
@@ -50,58 +65,73 @@ typedef struct {
 	uint64_t clockspeed;
 } hptl_config;
 
+// Configuration structure
+typedef struct {
+	uint64_t __hptl_time;
+	uint64_t __hptl_cicles;
+	uint64_t __hptl_hz;
+	uint64_t __hptl_precision;
+} hptl_clock;
+
+#include "hptl_deprecated.h"
+
 /**
  * Module initialization
+ * @param clk the hptl clk structure.
  * @param conf configuration. If NULL, default configuration is used.
  * @return 0 if correct, -1 if there is an error with configuration.
  **/
-int hptl_init (hptl_config *conf);
+int hptl_initclk (hptl_clock *clk, hptl_config *conf);
 
 /**
  * Clock Syncronization with RTSC
+ * @param clk the hptl clk structure.
  **/
-void hptl_sync (void);
+void hptl_syncclk (hptl_clock *clk);
 
 /**
  * HZ calibration
+ * @param clk the hptl clk structure.
  * @param diffTime the time between executions, example if hptl_get takes 17ns
  *and clockgettime 22ns, 5 (22-17) should be used
  * @return the hz modified
  **/
-int hptl_calibrateHz (int diffTime);
+int hptl_calibrate (hptl_clock *clk, int diffTime);
 
 /**
  * Gets current time
+ * @param clk the hptl clk structure.
  **/
-hptl_t hptl_get (void);
+hptl_t hptl_getTime (hptl_clock *clk);
 
 /**
  * Return the resolution in terms of ns
+ * @param clk the hptl clk structure.
  **/
-uint64_t hptl_getres (void);
+uint64_t hptl_getclkres (hptl_clock *clk);
 
 /**
  * Wait certain ns actively.
- * hptl should be initialized first.
+ * @param clk the hptl clk structure.
  **/
-void hptl_waitns (uint64_t ns);
+void hptl_wait (uint64_t ns);
 
 /** UTILS **/
 
 /**
  * Converts from HPTLib format to timespec format
  **/
-struct timespec hptl_timespec (hptl_t hptltime);
+struct timespec hptl_clktimespec (hptl_clock *clk, hptl_t hptltime);
 
 /**
  * Converts from HPTLib format to timeval format
  **/
-struct timeval hptl_timeval (hptl_t hptltime);
+struct timeval hptl_clktimeval (hptl_clock *clk, hptl_t hptltime);
 
 /**
  * Converts from HPTLib format to ns from 01 Jan 1970
  **/
-uint64_t hptl_ntimestamp (hptl_t hptltime);
+uint64_t hptl_clkntimestamp (hptl_clock *clk, hptl_t hptltime);
 
 #ifdef __cplusplus
 }

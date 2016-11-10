@@ -277,7 +277,7 @@ int hptl_calibrate (hptl_clock *clk, int diffTime) {
 		           (errorPrima.tv_nsec / 1000L) % 1000L,
 		           errorPrima.tv_nsec % 1000L
 		            );*/
-	} while (errorPrima.tv_nsec <= error.tv_nsec && errorPrima.tv_nsec > 16);
+	} while (errorPrima.tv_nsec <= error.tv_nsec && errorPrima.tv_nsec > (10000000000ull / PRECCISION));
 
 	if (hzCalibrated == 1) {  // Execute only, if previous execution does not
 		                      // calibrated (but descalibrated).
@@ -287,7 +287,7 @@ int hptl_calibrate (hptl_clock *clk, int diffTime) {
 
 			newhptl    = (tmp / (__hptl_hz + hzCalibrated)) + __hptl_time;
 			errorPrima = hptl_ts_diff (hptl_timespec (newhptl), newTime, NULL);
-		} while (errorPrima.tv_nsec <= error.tv_nsec && errorPrima.tv_nsec > 16);
+		} while (errorPrima.tv_nsec <= error.tv_nsec && errorPrima.tv_nsec > (10000000000ull / PRECCISION));
 	}
 
 	__hptl_hz += hzCalibrated;

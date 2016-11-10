@@ -26,14 +26,41 @@ It's important to note that the instruction counter is shared in a multi-core sy
 - The 1.0 version api now supports multi-threading.  
 
 # Performance comparison 
-Tested on Intel(R) Xeon(R) CPU E5-2630 v2 and Fedora release 20 (Heisenbug)
+Tested on Intel(R) Xeon(R) CPU E5-2620 v3 @ 2.40GHz and Centos 7
 
 | Function                             | Resolution | Time per call  |
 | ------------------------------------ | ----------:| -----:|
-| HPTimeLib                            | 1 ns     | **22 ns** |
-| clock_gettime(CLOCK_REALTIME)        | 1 ns       | 25 ns |
-| clock_gettime(CLOCK_REALTIME_COARSE) | 1000000 ns |  7 ns |
-| gettimeofday(NULL)                   | 1000 ns    | 26 ns |
+| HPTimeLib                            | 1 ns     | **18 ns** |
+| clock_gettime(CLOCK_REALTIME)        | 1 ns       | 23 ns |
+| clock_gettime(CLOCK_REALTIME_COARSE) | 1000000 ns |  6 ns |
+| gettimeofday(NULL)                   | 1000 ns    | 23 ns |
+
+# Clock deviation with 1 ns resolution
+Tested on Intel(R) Xeon(R) CPU E5-2620 v3 @ 2.40GHz and Centos 7 VS `clock_gettime(CLOCK_REALTIME)`.
+Shoud notice that clock_gettime(CLOCK_REALTIME) can, some times, travel to the past.
+
+| Seconds from last sync   | `clock_gettime(CLOCK_REALTIME)`  |
+|:------------------------:| --------------------------------:|
+| 0                        | - 0 us,  99 ns                   |
+| 0.2                      | - 1 us, 592 ns                   |
+| 0.4                      | + 0 us,  73 ns                   |
+| 0.6                      | + 0 us,  92 ns                   |
+| 0.8                      | + 0 us, 324 ns                   |
+| 1                        | + 0 us, 359 ns                   |
+| 1.2                      | + 0 us, 519 ns                   |
+| 1.4                      | + 0 us, 483 ns                   |
+| 1.6                      | + 0 us, 685 ns                   |
+| 1.8                      | + 0 us, 782 ns                   |
+| 2                        | + 0 us, 849 ns                   |
+| 2.1                      | + 0 us, 938 ns                   |
+| 2.3                      | - 0 us, 584 ns                   |
+| 2.5                      | + 1 us, 160 ns                   |
+| 2.7                      | + 1 us, 146 ns                   |
+| 2.9                      | + 1 us, 359 ns                   |
+| 3                        | + 1 us, 403 ns                   |
+| 3.2                      | + 1 us, 538 ns                   |
+| 3.4                      | + 1 us, 474 ns                   |
+| 3.6                      | + 1 us, 691 ns                   |
 
 # Known bugs/limitations
 

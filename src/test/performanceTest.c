@@ -41,7 +41,10 @@ int main (/*int argc, char **argv*/) {
 		printf (
 		    "\rHPCTimeLib                           [%7ldns res]  #%lu [%llu "
 		    "ns/call] -- Finished at %lu\n",
-		    hptl_getres (), j + 1, hptl_ntimestamp (dif) / TESTTIME, tmp);
+		    hptl_getres (),
+		    j + 1,
+		    hptl_ntimestamp (dif) / TESTTIME,
+		    tmp);
 
 		// Clock_Realtime Test
 		printf ("clock_gettime(CLOCK_REALTIME) #%lu [...]", j + 1);
@@ -58,7 +61,9 @@ int main (/*int argc, char **argv*/) {
 		printf (
 		    "\rclock_gettime(CLOCK_REALTIME)        [%7ldns res]  #%lu [%llu "
 		    "ns/call] -- Finished at %llu\n",
-		    resolution.tv_nsec, j + 1, hptl_ntimestamp (dif) / TESTTIME,
+		    resolution.tv_nsec,
+		    j + 1,
+		    hptl_ntimestamp (dif) / TESTTIME,
 		    cmtime.tv_sec * 10000000llu + cmtime.tv_nsec);
 
 		// Clock_Realtime Test
@@ -76,7 +81,9 @@ int main (/*int argc, char **argv*/) {
 		printf (
 		    "\rclock_gettime(CLOCK_REALTIME_COARSE) [%7ldns res]  #%lu [%llu "
 		    "ns/call] -- Finished at %llu\n",
-		    resolution.tv_nsec, j + 1, hptl_ntimestamp (dif) / TESTTIME,
+		    resolution.tv_nsec,
+		    j + 1,
+		    hptl_ntimestamp (dif) / TESTTIME,
 		    cmtime.tv_sec * 10000000llu + cmtime.tv_nsec);
 
 		// GetTimeOfDay Test
@@ -93,7 +100,9 @@ int main (/*int argc, char **argv*/) {
 		printf (
 		    "\rgettimeofday(NULL)                   [%7ldns res]  #%lu [%llu "
 		    "ns/call] -- Finished at %llu\n",
-		    1000l, j + 1, hptl_ntimestamp (dif) / TESTTIME,
+		    1000l,
+		    j + 1,
+		    hptl_ntimestamp (dif) / TESTTIME,
 		    gdtime.tv_sec * 10000000llu + gdtime.tv_usec * 1000);
 
 		puts ("-----\t-----\t-----");

@@ -185,8 +185,8 @@ int hptl_initclk (hptl_clock *clk, hptl_config *conf) {
 	}
 
 #ifdef HPTL_DEBUG
-	printf ("[HPTLib] Started : Hz:%lu cicles:%lu tof:%lu\n", __hptl_hz, __hptl_cicles,
-	        __hptl_time);
+	printf (
+	    "[HPTLib] Started : Hz:%lu cicles:%lu tof:%lu\n", __hptl_hz, __hptl_cicles, __hptl_time);
 #endif
 #endif
 
@@ -277,7 +277,8 @@ int hptl_calibrate (hptl_clock *clk, int diffTime) {
 		           (errorPrima.tv_nsec / 1000L) % 1000L,
 		           errorPrima.tv_nsec % 1000L
 		            );*/
-	} while (errorPrima.tv_nsec <= error.tv_nsec && (uint64_t)errorPrima.tv_nsec > (10000000000ull / PRECCISION));
+	} while (errorPrima.tv_nsec <= error.tv_nsec &&
+	         (uint64_t)errorPrima.tv_nsec > (10000000000ull / PRECCISION));
 
 	if (hzCalibrated == 1) {  // Execute only, if previous execution does not
 		                      // calibrated (but descalibrated).
@@ -287,7 +288,8 @@ int hptl_calibrate (hptl_clock *clk, int diffTime) {
 
 			newhptl    = (tmp / (__hptl_hz + hzCalibrated)) + __hptl_time;
 			errorPrima = hptl_ts_diff (hptl_timespec (newhptl), newTime, NULL);
-		} while (errorPrima.tv_nsec <= error.tv_nsec && (uint64_t)errorPrima.tv_nsec > (10000000000ull / PRECCISION));
+		} while (errorPrima.tv_nsec <= error.tv_nsec &&
+		         (uint64_t)errorPrima.tv_nsec > (10000000000ull / PRECCISION));
 	}
 
 	__hptl_hz += hzCalibrated;
@@ -327,7 +329,9 @@ hptl_t hptl_getTime (hptl_clock *clk) {
 /**
  * Return the resolution in terms of ns
  **/
-uint64_t hptl_getclkres (hptl_clock *clk) { return 1000000000ull / PRECCISION; }
+uint64_t hptl_getclkres (hptl_clock *clk) {
+	return 1000000000ull / PRECCISION;
+}
 
 /**
  * Wait certain ns actively

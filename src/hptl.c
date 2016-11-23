@@ -334,6 +334,15 @@ uint64_t hptl_getclkres (hptl_clock *clk) {
 }
 
 /**
+ * Convert a certain number of nanoseconds into clock-cycles
+ * @param clk the hptl clk structure.
+ * @param ns the ns to convert into clock-cycles
+ **/
+uint64_t hptl_ns2cycles (hptl_clock *clk, uint64_t ns) {
+	return (ns * 1000000000ull) / __hptl_hz;
+}
+
+/**
  * Wait certain ns actively
  **/
 void hptl_wait (uint64_t ns) {
@@ -363,10 +372,11 @@ void hptl_wait (uint64_t ns) {
  * Wait certain cycles actively.
  * @param clk the hptl clk structure.
  **/
-void hptl_wait_cycles (uint64_t cycles){
-	uint64_t tscreg = hptl_rdtsc();
-	uint64_t dest = tscreg+cycles;
-	while(hptl_rdtsc() < dest);
+void hptl_wait_cycles (uint64_t cycles) {
+	uint64_t tscreg = hptl_rdtsc ();
+	uint64_t dest = tscreg + cycles;
+	while (hptl_rdtsc () < dest)
+		;
 }
 
 /**

@@ -105,6 +105,13 @@ int hptl_calibrate (hptl_clock *clk, int diffTime);
 hptl_t hptl_getTime (hptl_clock *clk);
 
 /**
+ * Convert a certain number of nanoseconds into clock-cycles
+ * @param clk the hptl clk structure.
+ * @param ns the ns to convert into clock-cycles
+ **/
+uint64_t hptl_ns2cycles (hptl_clock *clk, uint64_t ns);
+
+/**
  * Return the resolution in terms of ns
  * @param clk the hptl clk structure.
  **/

@@ -54,6 +54,12 @@ hptl_t hptl_get (void);
 uint64_t hptl_getres (void);
 
 /**
+ * Convert a certain number of nanoseconds into clock-cycles
+ * @param ns the ns to convert into clock-cycles
+ **/
+uint64_t hptl_n2c (uint64_t ns);
+
+/**
  * Wait certain ns actively.
  * hptl should be initialized first.
  **/

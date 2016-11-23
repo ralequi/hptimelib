@@ -25,6 +25,10 @@ uint64_t hptl_getres (void) {
 	return hptl_getclkres (&globalClk);
 }
 
+uint64_t hptl_n2c (uint64_t ns) {
+	return hptl_ns2cycles (&globalClk, ns);
+}
+
 void hptl_waitns (uint64_t ns) {
 	hptl_wait (ns);
 }

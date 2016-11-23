@@ -22,7 +22,7 @@ int main (/*int argc, char **argv*/) {
 	hptl_init (&confhptl);
 
 	// getting resolution
-	printf ("Hptlib efectivly configured with precision of %lu 0s\n", hptl_getres ());
+	printf ("Hptlib efectivly configured with precision of %lu ns\n", hptl_getres ());
 
 	// Getting RAW time
 	printf ("RAW time : %lu\n", hptl_get ());

@@ -360,6 +360,16 @@ void hptl_wait (uint64_t ns) {
 }
 
 /**
+ * Wait certain cycles actively.
+ * @param clk the hptl clk structure.
+ **/
+void hptl_wait_cycles (uint64_t cycles){
+	uint64_t tscreg = hptl_rdtsc();
+	uint64_t dest = tscreg+cycles;
+	while(hptl_rdtsc() < dest);
+}
+
+/**
  * Converts from realtime format to timespect format
  **/
 struct timespec hptl_clktimespec (hptl_clock *clk, hptl_t u64) {

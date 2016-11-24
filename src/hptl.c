@@ -339,32 +339,21 @@ uint64_t hptl_getclkres (hptl_clock *clk) {
  * @param ns the ns to convert into clock-cycles
  **/
 uint64_t hptl_ns2cycles (hptl_clock *clk, uint64_t ns) {
-	return (ns * 1000000000ull) / __hptl_hz;
+	return (ns * __hptl_hz) / 1E9;
 }
 
 /**
  * Wait certain ns actively
  **/
-void hptl_wait (uint64_t ns) {
+void hptl_wait (hptl_clock *clk, uint64_t ns) {
 #ifdef HPTL_ONLYLINUXAPI
 	struct timespec sleeptime;
 	sleeptime.tv_sec  = ns / 1000000000ull;
 	sleeptime.tv_nsec = ns % 1000000000ull;
 	nanosleep (&sleeptime, NULL);
 #else
-	hptl_t start, end;
-
-	// start = hptl_rdtsc();
-	start = hptl_get ();
-
-	// float cycles = ((float)ns)*(((float)__hptl_hz)/1000000000.);
-	// end = start + cycles;
-	end = start + ns;
-
-	do {
-		// start = hptl_rdtsc();
-		start = hptl_get ();
-	} while (start < end);
+	uint64_t cycles = hptl_ns2cycles (clk, ns);
+	hptl_wait_cycles (cycles);
 #endif
 }
 

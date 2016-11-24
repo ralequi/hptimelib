@@ -30,7 +30,7 @@ uint64_t hptl_n2c (uint64_t ns) {
 }
 
 void hptl_waitns (uint64_t ns) {
-	hptl_wait (ns);
+	hptl_wait (&globalClk, ns);
 }
 
 struct timespec hptl_timespec (hptl_t hptltime) {

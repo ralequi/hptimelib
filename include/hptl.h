@@ -121,7 +121,7 @@ uint64_t hptl_getclkres (hptl_clock *clk);
  * Wait certain ns actively.
  * @param clk the hptl clk structure.
  **/
-void hptl_wait (uint64_t ns);
+void hptl_wait (hptl_clock *clk, uint64_t ns);
 
 /**
  * Wait certain cycles actively.

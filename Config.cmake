@@ -4,6 +4,8 @@
 
 option(HPTL_DEBUG "Enable HPTL debug text" ON)
 option(HPTL_ONLYLINUXAPI "Disables custom HPTL functionality and compiles as a Linux-Time wrapper" OFF)
+option(HPTL_128b "Compiles in 128b mode" ON)
+
 #set   (HPTL_DEBUG "https" CACHE STRING "The server api URI-protocol")
 
 #check RDTSC (only Intel)

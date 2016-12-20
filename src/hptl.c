@@ -229,10 +229,11 @@ int hptl_calibrate (hptl_clock *clk, int diffTime) {
 	struct timespec newTime;
 
 	// get the hptltime
-	unsigned long long tmp;
-	volatile unsigned long long Oflag;
-
+	ihptl_t tmp;
 	_hptlru tsc;
+#ifndef HPTL_128b  // for posible overflows
+	volatile uint64_t Oflag;
+#endif
 
 	hptl_waitns (750000000);
 
@@ -240,12 +241,14 @@ int hptl_calibrate (hptl_clock *clk, int diffTime) {
 
 	tmp = ((tsc.tsc_64 - __hptl_cicles) * PRECCISION);
 
+#ifndef HPTL_128b  // for posible overflows
 	overflowflag (Oflag);
 
 	if (Oflag) {
 		hptl_sync ();
 		return hptl_calibrateHz (diffTime);
 	}
+#endif
 
 	// calibrates the time provided by diffTime
 	clock_gettime (CLOCK_REALTIME, &newTime);
@@ -306,21 +309,24 @@ hptl_t hptl_getTime (hptl_clock *clk) {
 	return ret;
 #else
 	// Advanced high-eficiency mode
-	unsigned long long tmp;
-	volatile unsigned long long Oflag;
-
+	ihptl_t tmp;
 	_hptlru tsc;
+#ifndef HPTL_128b  // for posible overflows
+	volatile uint64_t Oflag;
+#endif
 
 	asm volatile("rdtsc" : "=a"(tsc.lo_32), "=d"(tsc.hi_32));
 
 	tmp = ((tsc.tsc_64 - __hptl_cicles) * PRECCISION);
 
+#ifndef HPTL_128b  // for posible overflows
 	overflowflag (Oflag);
 
 	if (Oflag) {
 		hptl_sync ();
 		return hptl_get ();
 	}
+#endif
 
 	return (tmp / __hptl_hz) + __hptl_time;
 #endif

@@ -44,6 +44,13 @@ extern "C" {
 #endif
 #endif
 
+//Internal type (64 or 128b)
+#ifdef HPTL_128b
+typedef __int128 ihptl_t;
+#else
+typedef uint64_t ihptl_t;
+#endif
+
 // Type used to store timing in hptlib
 typedef uint64_t hptl_t;
 
@@ -70,7 +77,7 @@ typedef struct {
 	uint64_t __hptl_time;
 	uint64_t __hptl_cicles;
 	uint64_t __hptl_hz;
-	uint64_t __hptl_precision;
+	ihptl_t __hptl_precision;
 } hptl_clock;
 
 #include "hptl_deprecated.h"

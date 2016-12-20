@@ -39,7 +39,7 @@ int main (/*int argc, char **argv*/) {
 		end = hptl_get ();
 		dif = end - start;
 		printf (
-		    "\rHPCTimeLib                           [%7ldns res]  #%lu [%llu "
+		    "\rHPCTimeLib                           [%7ldns res]  #%lu [%02llu "
 		    "ns/call] -- Finished at %lu\n",
 		    hptl_getres (),
 		    j + 1,
@@ -59,7 +59,7 @@ int main (/*int argc, char **argv*/) {
 		dif = end - start;
 		clock_getres (CLOCK_REALTIME, &resolution);
 		printf (
-		    "\rclock_gettime(CLOCK_REALTIME)        [%7ldns res]  #%lu [%llu "
+		    "\rclock_gettime(CLOCK_REALTIME)        [%7ldns res]  #%lu [%02llu "
 		    "ns/call] -- Finished at %llu\n",
 		    resolution.tv_nsec,
 		    j + 1,
@@ -79,7 +79,7 @@ int main (/*int argc, char **argv*/) {
 		dif = end - start;
 		clock_getres (CLOCK_REALTIME_COARSE, &resolution);
 		printf (
-		    "\rclock_gettime(CLOCK_REALTIME_COARSE) [%7ldns res]  #%lu [%llu "
+		    "\rclock_gettime(CLOCK_REALTIME_COARSE) [%7ldns res]  #%lu [%02llu "
 		    "ns/call] -- Finished at %llu\n",
 		    resolution.tv_nsec,
 		    j + 1,
@@ -98,7 +98,7 @@ int main (/*int argc, char **argv*/) {
 		end = hptl_get ();
 		dif = end - start;
 		printf (
-		    "\rgettimeofday(NULL)                   [%7ldns res]  #%lu [%llu "
+		    "\rgettimeofday(NULL)                   [%7ldns res]  #%lu [%02llu "
 		    "ns/call] -- Finished at %llu\n",
 		    1000l,
 		    j + 1,

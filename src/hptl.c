@@ -328,11 +328,11 @@ hptl_t hptl_getTime (hptl_clock *clk) {
 	}
 #endif
 #ifdef HPTL_128b_mixed
-	if(__builtin_expect((tmp > 0xFFFFFFFFFFFFFFFFull),0)) {
+	if (__builtin_expect ((tmp > 0xFFFFFFFFFFFFFFFFull), 0)) {
 		hptl_sync ();
 		return hptl_get ();
 	}
-	#endif
+#endif
 
 	return (tmp / __hptl_hz) + __hptl_time;
 #endif

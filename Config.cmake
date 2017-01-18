@@ -5,7 +5,7 @@
 option(HPTL_DEBUG "Enable HPTL debug text" ON)
 option(HPTL_ONLYLINUXAPI "Disables custom HPTL functionality and compiles as a Linux-Time wrapper" OFF)
 option(HPTL_128b "Compiles in 128b mode" ON)
-option(HPTL_128b_mixed "Compiles in 128b mode, but without (almost) fill the high part" ON)
+option(HPTL_128b_mixed "Compiles in 128b mode, but (almost) without fill the 64b high part" ON)
 
 #set   (HPTL_DEBUG "https" CACHE STRING "The server api URI-protocol")
 

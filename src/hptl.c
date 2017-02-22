@@ -178,10 +178,10 @@ int hptl_initclk (hptl_clock *clk, hptl_config *conf) {
 		__hptl_hz = config.clockspeed;
 	}
 
-	hptl_sync ();
+	hptl_syncclk (clk);
 
 	if (config.clockspeed == 0) {
-		hptl_calibrateHz (0);
+		hptl_calibrate (clk, 0);
 	}
 
 #ifdef HPTL_DEBUG
@@ -235,7 +235,7 @@ int hptl_calibrate (hptl_clock *clk, int diffTime) {
 	volatile uint64_t Oflag;
 #endif
 
-	hptl_waitns (750000000);
+	hptl_wait (clk, 750000000);
 
 	asm volatile("rdtsc" : "=a"(tsc.lo_32), "=d"(tsc.hi_32));
 
@@ -245,8 +245,8 @@ int hptl_calibrate (hptl_clock *clk, int diffTime) {
 	overflowflag (Oflag);
 
 	if (Oflag) {
-		hptl_sync ();
-		return hptl_calibrateHz (diffTime);
+		hptl_syncclk (clk);
+		return hptl_calibrate (clk, diffTime);
 	}
 #endif
 
@@ -258,14 +258,15 @@ int hptl_calibrate (hptl_clock *clk, int diffTime) {
 	unsigned long long newhptl;
 	struct timespec error, errorPrima;
 
-	errorPrima = hptl_ts_diff (hptl_timespec ((tmp / __hptl_hz) + __hptl_time), newTime, NULL);
+	errorPrima =
+	    hptl_ts_diff (hptl_clktimespec (clk, (tmp / __hptl_hz) + __hptl_time), newTime, NULL);
 
 	do {
 		error = errorPrima;
 		hzCalibrated++;
 
 		newhptl    = (tmp / (__hptl_hz + hzCalibrated)) + __hptl_time;
-		errorPrima = hptl_ts_diff (hptl_timespec (newhptl), newTime, NULL);
+		errorPrima = hptl_ts_diff (hptl_clktimespec (clk, newhptl), newTime, NULL);
 
 		/*printf("\n Was %c %lu s, %3lu ms, %3lu us, %3lu ns ; now %c
 		   %lu s, %3lu ms, %3lu us, %3lu ns\n",
@@ -290,7 +291,7 @@ int hptl_calibrate (hptl_clock *clk, int diffTime) {
 			hzCalibrated--;
 
 			newhptl    = (tmp / (__hptl_hz + hzCalibrated)) + __hptl_time;
-			errorPrima = hptl_ts_diff (hptl_timespec (newhptl), newTime, NULL);
+			errorPrima = hptl_ts_diff (hptl_clktimespec (clk, newhptl), newTime, NULL);
 		} while (errorPrima.tv_nsec <= error.tv_nsec &&
 		         (uint64_t)errorPrima.tv_nsec > (10000000000ull / PRECCISION));
 	}
@@ -323,14 +324,14 @@ hptl_t hptl_getTime (hptl_clock *clk) {
 	overflowflag (Oflag);
 
 	if (Oflag) {
-		hptl_sync ();
-		return hptl_get ();
+		hptl_syncclk (clk);
+		return hptl_getTime (clk);
 	}
 #endif
 #ifdef HPTL_128b_mixed
 	if (__builtin_expect ((tmp > 0xFFFFFFFFFFFFFFFFull), 0)) {
-		hptl_sync ();
-		return hptl_get ();
+		hptl_syncclk (clk);
+		return hptl_getTime (clk);
 	}
 #endif
 

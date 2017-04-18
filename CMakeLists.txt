@@ -64,20 +64,27 @@ file(GLOB lib_SRC
 include(Config.cmake)
 
 #The library
-add_library(hptl SHARED ${lib_SRC} ${lib_INCLUDE})
-
 # this is the "object library" target: compiles the sources only once
 add_library(hptl_obj OBJECT ${lib_SRC} ${lib_INCLUDE})
 # shared libraries need PIC
 set_property(TARGET ${hptl_obj} PROPERTY POSITION_INDEPENDENT_CODE 1)
 # actual shared and static libraries built from the same object files
-add_library(hptl_shared SHARED $<TARGET_OBJECTS:hptl_obj>)
-add_library(hptl_static STATIC $<TARGET_OBJECTS:hptl_obj>)
+add_library(hptl-shared SHARED $<TARGET_OBJECTS:hptl_obj>)
+add_library(hptl STATIC $<TARGET_OBJECTS:hptl_obj>)
+
+# Rename the lib
+set_target_properties(hptl PROPERTIES
+        OUTPUT_NAME hptl
+        ARCHIVE_OUTPUT_NAME hptl)
+set_target_properties(hptl-shared PROPERTIES
+        OUTPUT_NAME hptl
+        ARCHIVE_OUTPUT_NAME hptl)
+
 
 #Library Dependencies
 if(HPTL_CLOCKREALTIME)
-    target_link_libraries(hptl_shared rt)
-    target_link_libraries(hptl_static rt)
+    target_link_libraries(hptl-shared rt)
+    target_link_libraries(hptl rt)
 endif()
 
 #Tests
@@ -87,7 +94,7 @@ add_executable(exampleTest src/test/exampleTest)
 add_executable(performanceTest src/test/performanceTest)
 
 #Link library executables
-target_link_libraries(deviationTest hptl_static)
-target_link_libraries(pdeviationTest hptl_static)
-target_link_libraries(exampleTest hptl_static)
-target_link_libraries(performanceTest hptl_static)
+target_link_libraries(deviationTest hptl)
+target_link_libraries(pdeviationTest hptl)
+target_link_libraries(exampleTest hptl)
+target_link_libraries(performanceTest hptl)

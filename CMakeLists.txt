@@ -15,6 +15,7 @@ add_definitions(-std=gnu11 -Wall -Wextra -Werror -O3 -g -pipe -flto -ffat-lto-ob
 SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -flto -O3 -g -pipe")
 SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -flto -O3 -g -pipe")
 
+if (NOT NO_REDEFINEFUNTIONS)
 #Function to make output a bit more quiet
 function(message)
     if (NOT MESSAGE_QUIET)
@@ -46,6 +47,7 @@ function(INSTALL)
     else()
     endif()
 endfunction()
+endif()
 
 #Import all .hpp
 file(GLOB lib_INCLUDE

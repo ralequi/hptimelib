@@ -39,7 +39,7 @@ int main (/*int argc, char **argv*/) {
 		}
 
 		rt = hptl_timespec (tmp);
-		df = diff (cmtime, rt, &sign);
+		df = diff (rt, cmtime, &sign);
 		printf (
 		    " Deviation of %c %lu s, %3lu ms, %3lu us, %3lu ns from "
 		    "clock_gettime(CLOCK_REALTIME).\n",
@@ -76,12 +76,23 @@ struct timespec diff (struct timespec start, struct timespec end, char *sign) {
 		*sign = '+';
 	}
 
-	if ((end.tv_nsec - start.tv_nsec) < 0) {
-		temp.tv_sec  = end.tv_sec - start.tv_sec - 1;
-		temp.tv_nsec = 1000000000ull + end.tv_nsec - start.tv_nsec;
+	/*if ((end.tv_nsec - start.tv_nsec) < 0) {
+	    temp.tv_sec  = end.tv_sec - start.tv_sec - 1;
+	    temp.tv_nsec = 1000000000ull + end.tv_nsec - start.tv_nsec;
+	} else {
+	    temp.tv_sec  = end.tv_sec - start.tv_sec;
+	    temp.tv_nsec = end.tv_nsec - start.tv_nsec;
+	}*/
+	if (end.tv_sec == start.tv_sec) {
+		temp.tv_nsec = end.tv_nsec - start.tv_nsec;
+		temp.tv_sec  = 0;
 	} else {
 		temp.tv_sec  = end.tv_sec - start.tv_sec;
-		temp.tv_nsec = end.tv_nsec - start.tv_nsec;
+		int64_t nsec = end.tv_nsec - start.tv_nsec;
+		if (nsec < 0)
+			temp.tv_nsec = nsec + 1000000000ull;
+		else
+			temp.tv_nsec = nsec;
 	}
 
 	return temp;

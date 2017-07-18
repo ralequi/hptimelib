@@ -90,11 +90,13 @@ endif()
 #Tests
 add_executable(deviationTest src/test/deviationTest)
 add_executable(pdeviationTest src/test/pdeviationTest.c)
+add_executable(integrityTest src/test/integrityTest.c)
 add_executable(exampleTest src/test/exampleTest)
 add_executable(performanceTest src/test/performanceTest)
 
 #Link library executables
 target_link_libraries(deviationTest hptl)
 target_link_libraries(pdeviationTest hptl)
+target_link_libraries(integrityTest hptl)
 target_link_libraries(exampleTest hptl)
 target_link_libraries(performanceTest hptl)

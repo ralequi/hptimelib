@@ -3,6 +3,7 @@ project (High_Performance_Timing_Library)
 # The version number.
 execute_process(
     COMMAND git describe --always --tags
+    WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
     OUTPUT_VARIABLE hptl_VERSION)
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)

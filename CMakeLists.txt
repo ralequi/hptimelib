@@ -16,40 +16,6 @@ add_definitions(-std=gnu11 -Wall -Wextra -Werror -O3 -g -pipe -flto -ffat-lto-ob
 SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -flto -O3 -g -pipe")
 SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -flto -O3 -g -pipe")
 
-if (NOT NO_REDEFINEFUNTIONS)
-#Function to make output a bit more quiet
-function(message)
-    if (NOT MESSAGE_QUIET)
-        _message(${ARGN})
-    endif()
-endfunction()
-
-#Function to remove imported executables
-function(add_executable)
-    if (NOT NO_COMPILE_EXECUTABLES)
-        _add_executable(${ARGN})
-    else()
-        _add_executable(${ARGN})
-        set_target_properties(${ARGV0} PROPERTIES EXCLUDE_FROM_ALL 1 EXCLUDE_FROM_DEFAULT_BUILD 1)
-    endif()
-endfunction()
-
-#Function to remove custom targets
-function(add_custom_target)
-    if (NOT NO_ADD_CUSTOM)
-        _add_custom_target(${ARGN})
-    else()
-    endif()
-endfunction()
-
-function(INSTALL)
-    if (NOT NO_COMPILE_EXECUTABLES)
-        _INSTALL(${ARGN})
-    else()
-    endif()
-endfunction()
-endif()
-
 #Import all .hpp
 file(GLOB lib_INCLUDE
     "include/*.h"

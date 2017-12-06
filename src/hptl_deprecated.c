@@ -21,6 +21,10 @@ hptl_t hptl_get (void) {
 	return hptl_getTime (&globalClk);
 }
 
+hptl_t hptl_fget (void) {
+	return hptl_getFastestTime (&globalClk);
+}
+
 uint64_t hptl_getres (void) {
 	return hptl_getclkres (&globalClk);
 }

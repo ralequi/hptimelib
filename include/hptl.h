@@ -21,13 +21,13 @@ extern "C" {
 #endif
 
 #include <inttypes.h>
-#include <time.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/syscall.h>
+#include <time.h>
 #include <unistd.h>
 
 // Config file
@@ -110,6 +110,13 @@ int hptl_calibrate (hptl_clock *clk, int diffTime);
  * @param clk the hptl clk structure.
  **/
 hptl_t hptl_getTime (hptl_clock *clk);
+
+/**
+ * Gets current time. The return would be in the format of the fatest function available in the
+ *system. Acuracy nor precision are not guaranteed
+ * @param clk the hptl clk structure.
+ **/
+hptl_t hptl_getFastestTime (hptl_clock *clk);
 
 /**
  * Convert a certain number of nanoseconds into clock-cycles

@@ -1,6 +1,5 @@
 // Place your settings in this file to overwrite default and user settings.
 // Place your settings in this file to overwrite default and user settings.
 {
-    "clang.cflags": ["-I", "${workspaceRoot}/include", "-std=gnu11"],
-    "clang.cxxflags": ["-I", "${workspaceRoot}/include", "-std=c++11"]
+    "editor.formatOnSave": true
 }

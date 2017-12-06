@@ -340,6 +340,24 @@ hptl_t hptl_getTime (hptl_clock *clk) {
 }
 
 /**
+ * Gets current time. The return would be in the format of the fatest function available in the
+ *system. Acuracy nor precision are not guaranteed
+ * @param clk the hptl clk structure.
+ **/
+hptl_t hptl_getFastestTime (hptl_clock *clk) {
+	(void)clk;
+
+	struct timespec cmtime;
+	clock_gettime (CLOCK_REALTIME_COARSE, &cmtime);
+	hptl_t ret;
+
+	ret = cmtime.tv_nsec;
+	ret += cmtime.tv_sec * 1000000000;
+
+	return ret;
+}
+
+/**
  * Return the resolution in terms of ns
  **/
 uint64_t hptl_getclkres (hptl_clock *clk) {
@@ -376,7 +394,7 @@ void hptl_wait (hptl_clock *clk, uint64_t ns) {
  **/
 void hptl_wait_cycles (uint64_t cycles) {
 	uint64_t tscreg = hptl_rdtsc ();
-	uint64_t dest = tscreg + cycles;
+	uint64_t dest   = tscreg + cycles;
 	while (hptl_rdtsc () < dest)
 		;
 }

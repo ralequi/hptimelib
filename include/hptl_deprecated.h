@@ -49,6 +49,12 @@ int hptl_calibrateHz (int diffTime);
 hptl_t hptl_get (void);
 
 /**
+ * Gets current time. The return would be in the format of the fatest function available in the
+ *system. Acuracy nor precision are not guaranteed
+ **/
+hptl_t hptl_fget (void);
+
+/**
  * Return the resolution in terms of ns
  **/
 uint64_t hptl_getres (void);

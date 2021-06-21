@@ -10,8 +10,6 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-include_directories("include")
-
 add_definitions(-std=gnu11 -Wall -Wextra -Werror -O3 -g -pipe -flto -ffat-lto-objects)
 SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -flto -O3 -g -pipe")
 SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -flto -O3 -g -pipe")
@@ -38,6 +36,10 @@ set_property(TARGET ${hptl_obj} PROPERTY POSITION_INDEPENDENT_CODE 1)
 # actual shared and static libraries built from the same object files
 add_library(hptl-shared SHARED $<TARGET_OBJECTS:hptl_obj>)
 add_library(hptl STATIC $<TARGET_OBJECTS:hptl_obj>)
+
+target_include_directories(hptl_obj PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_include_directories(hptl-shared PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_include_directories(hptl PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 # Rename the lib
 set_target_properties(hptl PROPERTIES

@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 2.8.11)
+cmake_minimum_required (VERSION 3.10.0)
 project (High_Performance_Timing_Library)
 # The version number.
 execute_process(
@@ -55,11 +55,11 @@ if(HPTL_CLOCKREALTIME)
 endif()
 
 #Tests
-add_executable(deviationTest src/test/deviationTest)
+add_executable(deviationTest src/test/deviationTest.c)
 add_executable(pdeviationTest src/test/pdeviationTest.c)
 add_executable(integrityTest src/test/integrityTest.c)
-add_executable(exampleTest src/test/exampleTest)
-add_executable(performanceTest src/test/performanceTest)
+add_executable(exampleTest src/test/exampleTest.c)
+add_executable(performanceTest src/test/performanceTest.c)
 
 #Link library executables
 target_link_libraries(deviationTest hptl)

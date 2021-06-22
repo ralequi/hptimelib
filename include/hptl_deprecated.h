@@ -6,9 +6,10 @@
 
   License: MIT License
   (c) HPCN 2014-2017
+  (c) Naudit HPCN S.L. 2018-2021
 
   Author: Rafael Leira
-  E-Mail: rafael.leira@uam.es
+  E-Mail: rafael.leira@naudit.es
 
   Description: Old header file for hptl
 

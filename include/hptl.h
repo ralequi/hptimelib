@@ -47,7 +47,7 @@ extern "C" {
 
 // Internal type (64 or 128b)
 #ifdef HPTL_128b
-typedef __int128 ihptl_t;
+typedef unsigned __int128 ihptl_t;
 #else
 typedef uint64_t ihptl_t;
 #endif

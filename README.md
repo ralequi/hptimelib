@@ -26,17 +26,17 @@ It's important to note that the instruction counter is shared in a multi-core sy
 - The 1.0 version api now supports multi-threading.  
 
 # Performance comparison 
-Tested on Intel(R) Xeon(R) CPU E5-2620 v3 @ 2.40GHz and Centos 7
+Tested on `Intel(R) Xeon(R) CPU E5-2620 v3 @ 2.40GHz` and `Fedora 40`
 
 | Function                             | Resolution | Time per call  |
-| ------------------------------------ | ----------:| -----:|
-| HPTimeLib                            | 1 ns     | **18 ns** |
-| clock_gettime(CLOCK_REALTIME)        | 1 ns       | 23 ns |
-| clock_gettime(CLOCK_REALTIME_COARSE) | 1000000 ns |  6 ns |
-| gettimeofday(NULL)                   | 1000 ns    | 23 ns |
+| ------------------------------------ | ----------:| --------------:|
+| HPTimeLib                            | 1 ns       |      ** 9 ns** |
+| clock_gettime(CLOCK_REALTIME)        | 1 ns       |          15 ns |
+| clock_gettime(CLOCK_REALTIME_COARSE) | 1000000 ns |           4 ns |
+| gettimeofday(NULL)                   | 1000 ns    |          15 ns |
 
-# Clock deviation with 1 ns resolution
-Tested on Intel(R) Xeon(R) CPU E5-2620 v3 @ 2.40GHz and Centos 7 VS `clock_gettime(CLOCK_REALTIME)`.
+# Clock deviation with 1 ns resolution (pdeviationTest)
+Tested on `Intel(R) Xeon(R) CPU E5-2620 v3 @ 2.40GHz` and `Centos 7` VS `clock_gettime(CLOCK_REALTIME)`.
 Shoud notice that clock_gettime(CLOCK_REALTIME) can, some times, travel to the past.
 
 | Seconds from last sync   | `clock_gettime(CLOCK_REALTIME)`  |

@@ -21,13 +21,14 @@
             "macFrameworkPath": [
                 "/System/Library/Frameworks",
                 "/Library/Frameworks"
-            ]
+            ],
+            "compilerPath": "/usr/lib64/ccache/clang",
+            "cStandard": "c17",
+            "cppStandard": "c++17"
         },
         {
             "name": "Linux",
             "includePath": [
-                "/usr/lib64/gcc/x86_64-pc-linux-gnu/5.4.0/include/",
-                "/usr/lib64/gcc/x86_64-pc-linux-gnu/5.4.0/include/g++-v5",
                 "/usr/include",
                 "/usr/include/linux",
                 "/usr/local/include",
@@ -40,8 +41,6 @@
             "intelliSenseMode": "clang-x64",
             "browse": {
                 "path": [
-                    "/usr/lib64/gcc/x86_64-pc-linux-gnu/5.4.0/include/",
-                    "/usr/lib64/gcc/x86_64-pc-linux-gnu/5.4.0/include/g++-v5",
                     "/usr/include",
                     "/usr/include/linux",
                     "/usr/local/include",
@@ -49,7 +48,10 @@
                 ],
                 "limitSymbolsToIncludedHeaders": true,
                 "databaseFilename": ""
-            }
+            },
+            "compilerPath": "/usr/lib64/ccache/clang",
+            "cStandard": "c17",
+            "cppStandard": "c++17"
         },
         {
             "name": "Win32",
@@ -69,8 +71,11 @@
                 ],
                 "limitSymbolsToIncludedHeaders": true,
                 "databaseFilename": ""
-            }
+            },
+            "compilerPath": "/usr/lib64/ccache/clang",
+            "cStandard": "c17",
+            "cppStandard": "c++17"
         }
     ],
-    "version": 3
+    "version": 4
 }

@@ -370,7 +370,7 @@ uint64_t hptl_getclkres (hptl_clock *clk) {
  * @param ns the ns to convert into clock-cycles
  **/
 uint64_t hptl_ns2cycles (hptl_clock *clk, uint64_t ns) {
-	return (ns * __hptl_hz) / 1E9;
+        return (ns * __hptl_hz) / 1000000000ull;
 }
 
 /**

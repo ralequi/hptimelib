@@ -40,7 +40,7 @@ endif()
 add_library(hptl_obj OBJECT ${lib_SRC} ${lib_INCLUDE})
 # compile options and features
 target_compile_features(hptl_obj PUBLIC c_std_11)
-target_compile_options(hptl_obj PRIVATE -Wall -Wextra -Werror -O3 -g -pipe)
+target_compile_options(hptl_obj PRIVATE -Wall -Wextra -Werror -O3 -pipe)
 # shared libraries need PIC
 set_property(TARGET hptl_obj PROPERTY POSITION_INDEPENDENT_CODE ON)
 # actual shared and static libraries built from the same object files
@@ -88,7 +88,7 @@ add_executable(deviationTest src/test/deviationTest.c)
 add_executable(pdeviationTest src/test/pdeviationTest.c)
 add_executable(integrityTest src/test/integrityTest.c)
 add_executable(exampleTest src/test/exampleTest.c)
-add_executable(performanceTest src/test/performanceTest.c)
+add_executable(performanceTest src/test/performanceTest.cpp)
 
 #Link library executables
 target_link_libraries(deviationTest hptl)
@@ -96,3 +96,12 @@ target_link_libraries(pdeviationTest hptl)
 target_link_libraries(integrityTest hptl)
 target_link_libraries(exampleTest hptl)
 target_link_libraries(performanceTest hptl)
+
+# Ensure tests are built with similar optimizations and IPO as the library
+set(test_targets deviationTest pdeviationTest integrityTest exampleTest performanceTest)
+foreach(t ${test_targets})
+  target_compile_options(${t} PRIVATE -O3 -g -pipe)
+  if(ipo_supported)
+    set_property(TARGET ${t} PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
+  endif()
+endforeach()

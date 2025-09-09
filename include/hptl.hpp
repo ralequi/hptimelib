@@ -2,7 +2,7 @@
   Language: C++
 
   License: MIT License
-  (c) Naudit HPCN S.L. 2018-2021
+  (c) Naudit HPCN S.L. 2018-2025
 
   Author: Rafael Leira
   E-Mail: rafael.leira@naudit.es
@@ -19,9 +19,9 @@
 // C Lib
 #include "hptl.h"
 // Config file
-#include <system_error>
+#include <hptl_config.h>
 
-#include "hptl_config.h"
+#include <system_error>
 
 namespace hptl {
 class hptl {

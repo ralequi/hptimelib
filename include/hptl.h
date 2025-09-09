@@ -32,7 +32,7 @@ extern "C" {
 #include <unistd.h>
 
 // Config file
-#include "hptl_config.h"
+#include <hptl_config.h>
 
 // check for Errors
 #ifndef HPTL_TSC
@@ -81,7 +81,9 @@ typedef struct {
 	ihptl_t __hptl_precision;
 } hptl_clock;
 
-#include "hptl_deprecated.h"
+#ifdef HPTL_ENABLE_LEGACY
+#include "hptl_legacy.h"
+#endif
 
 /**
  * Module initialization

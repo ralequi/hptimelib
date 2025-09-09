@@ -25,6 +25,19 @@ It's important to note that the instruction counter is shared in a multi-core sy
 - The library ensures not repeated timestamps if resolution is at least  ![](http://www.sciweavers.org/tex2img.php?eq=10%5E%7B8%7D%20&bc=Transparent&fc=Black&im=png&fs=12&ff=arev&edit=0).
 - The 1.0 version api now supports multi-threading.  
 
+## C API modes (standard vs legacy)
+
+- Standard C API: functions receive an explicit `hptl_clock*` parameter. This is the default API and maximizes performance and clarity in multithreaded use.
+- Legacy C API: drop-in compatible wrappers that do not require an explicit clock. They use a global clock defined in the `.c` file. This API was previously called “deprecated” and is now named “legacy”.
+
+Build-time control (CMake):
+- `HPTL_ENABLE_LEGACY` (ON by default): enables the legacy wrappers and exports the old symbols (`hptl_init`, `hptl_get`, `hptl_getres`, ...). Turning this OFF removes those symbols from the library.
+
+Notes:
+- Binary compatibility is preserved by default (legacy is ON).
+- Headers expose the legacy prototypes only if legacy is enabled at configure time.
+- Include `hptl.h` for both APIs; the legacy header is `hptl_legacy.h` (the old `hptl_deprecated.h` remains as a compatibility shim).
+
 # Performance comparison 
 Tested on `Intel(R) Xeon(R) CPU E5-2620 v3 @ 2.40GHz` and `Fedora 40`
 

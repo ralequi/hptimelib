@@ -1,18 +1,20 @@
-cmake_minimum_required (VERSION 3.10.0)
-project (High_Performance_Timing_Library)
+cmake_minimum_required (VERSION 3.15)
+project (High_Performance_Timing_Library LANGUAGES C CXX)
 # The version number.
 execute_process(
     COMMAND git describe --always --tags
     WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
-    OUTPUT_VARIABLE hptl_VERSION)
+    OUTPUT_VARIABLE hptl_VERSION
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+)
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-add_definitions(-std=gnu11 -Wall -Wextra -Werror -O3 -g -pipe -flto -ffat-lto-objects)
-SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -flto -O3 -g -pipe")
-SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -flto -O3 -g -pipe")
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_C_EXTENSIONS ON)
 
 #Import all .hpp
 file(GLOB lib_INCLUDE
@@ -28,18 +30,43 @@ file(GLOB lib_SRC
 
 include(Config.cmake)
 
+# Optionally exclude legacy wrappers from the build
+if(NOT HPTL_ENABLE_LEGACY)
+    list(FILTER lib_SRC EXCLUDE REGEX ".*/hptl_deprecated\\.c$")
+endif()
+
 #The library
 # this is the "object library" target: compiles the sources only once
 add_library(hptl_obj OBJECT ${lib_SRC} ${lib_INCLUDE})
+# compile options and features
+target_compile_features(hptl_obj PUBLIC c_std_11)
+target_compile_options(hptl_obj PRIVATE -Wall -Wextra -Werror -O3 -g -pipe)
 # shared libraries need PIC
-set_property(TARGET ${hptl_obj} PROPERTY POSITION_INDEPENDENT_CODE 1)
+set_property(TARGET hptl_obj PROPERTY POSITION_INDEPENDENT_CODE ON)
 # actual shared and static libraries built from the same object files
 add_library(hptl-shared SHARED $<TARGET_OBJECTS:hptl_obj>)
 add_library(hptl STATIC $<TARGET_OBJECTS:hptl_obj>)
 
-target_include_directories(hptl_obj PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
-target_include_directories(hptl-shared PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
-target_include_directories(hptl PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+# Try enabling LTO/IPO if supported
+include(CheckIPOSupported)
+check_ipo_supported(RESULT ipo_supported OUTPUT ipo_error)
+if(ipo_supported)
+    set_property(TARGET hptl-shared PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
+    set_property(TARGET hptl PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
+endif()
+
+target_include_directories(hptl_obj PUBLIC
+    ${CMAKE_CURRENT_BINARY_DIR}/generated
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
+target_include_directories(hptl-shared PUBLIC
+    ${CMAKE_CURRENT_BINARY_DIR}/generated
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
+target_include_directories(hptl PUBLIC
+    ${CMAKE_CURRENT_BINARY_DIR}/generated
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
 
 # Rename the lib
 set_target_properties(hptl PROPERTIES

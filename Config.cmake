@@ -6,6 +6,7 @@ option(HPTL_DEBUG "Enable HPTL debug text" OFF)
 option(HPTL_ONLYLINUXAPI "Disables custom HPTL functionality and compiles as a Linux-Time wrapper" OFF)
 option(HPTL_128b "Compiles in 128b mode" ON)
 option(HPTL_128b_mixed "Compiles in 128b mode, but (almost) without fill the 64b high part" ON)
+option(HPTL_ENABLE_LEGACY "Enable legacy no-parameter C API (compat)" ON)
 
 #set   (HPTL_DEBUG "https" CACHE STRING "The server api URI-protocol")
 
@@ -25,7 +26,9 @@ CHECK_LIBRARY_EXISTS(rt clock_gettime "time.h" HPTL_CLOCKREALTIME)
 #  "${PROJECT_SOURCE_DIR}/include/config.hpp.in"
 #  "${PROJECT_BINARY_DIR}/include/config.hpp"
 #  )
+# Generate config header into build directory
+file(MAKE_DIRECTORY "${PROJECT_BINARY_DIR}/generated")
 configure_file (
   "${PROJECT_SOURCE_DIR}/include/hptl_config.h.in"
-  "${PROJECT_SOURCE_DIR}/include/hptl_config.h"
+  "${PROJECT_BINARY_DIR}/generated/hptl_config.h"
   )
